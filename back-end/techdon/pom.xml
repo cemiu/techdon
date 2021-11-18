@@ -14,7 +14,7 @@
 	<name>TechDon</name>
 	<description>TechDon is a platform on which unneeded devices can be donated to support the education of low-income students.</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 	</properties>
 	<dependencies>
 		<dependency>
