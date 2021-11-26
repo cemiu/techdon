@@ -15,6 +15,8 @@
 	<description>TechDon is a platform on which unneeded devices can be donated to support the education of low-income students.</description>
 	<properties>
 		<java.version>17</java.version>
+		<maven.compiler.source>16</maven.compiler.source>
+		<maven.compiler.target>16</maven.compiler.target>
 	</properties>
 	<dependencies>
 		<dependency>
