@@ -1,6 +1,6 @@
 package ac.brunel.techdon.util.db.fields;
 
-public enum DBStudentField implements DBFields {
+public enum DBStudentField implements DBField {
 
     UNIVERSITY("student/university"),
     COUNTRY("student/country"),

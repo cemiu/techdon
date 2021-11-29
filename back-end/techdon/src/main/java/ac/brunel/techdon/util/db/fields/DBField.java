@@ -1,6 +1,6 @@
 package ac.brunel.techdon.util.db.fields;
 
-interface DBFields {
+public interface DBField {
 
     String getKey();
     //<T> T getType();

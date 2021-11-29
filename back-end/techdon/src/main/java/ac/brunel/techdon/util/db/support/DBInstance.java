@@ -1,5 +1,7 @@
 package ac.brunel.techdon.util.db.support;
 
+import ac.brunel.techdon.util.db.fields.DBField;
+
 public interface DBInstance {
 
     public DBWriteMode getWriteMode();
@@ -21,12 +23,24 @@ public interface DBInstance {
         return get(key, String.class);
     }
 
+    public default String getString(DBField field) {
+        return getString(field.getKey());
+    }
+
     public default Integer getInt(String key) {
         return get(key, Integer.class);
     }
 
+    public default Integer getInt(DBField field) {
+        return getInt(field.getKey());
+    }
+
     public default Boolean getBoolean(String key) {
         return get(key, Boolean.class);
+    }
+
+    public default Boolean getBoolean(DBField field) {
+        return getBoolean(field.getKey());
     }
 
 }

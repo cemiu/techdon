@@ -1,7 +1,9 @@
 package ac.brunel.techdon.util.db;
 
-import ac.brunel.techdon.util.db.support.DBInstance;
+import static ac.brunel.techdon.util.db.fields.DBUserField.*;
+
 import ac.brunel.techdon.util.db.fields.DBUserField;
+import ac.brunel.techdon.util.db.support.DBInstance;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
 import org.bson.Document;
 
@@ -9,25 +11,33 @@ public abstract class DBUser implements DBInstance {
 
     private static final DBInterface db = new DBInterface("users");
 
-    private DBWriteMode writeMode;
+    private DBWriteMode writeMode = DBWriteMode.MANUAL;
     private Document doc;
     private boolean existsInDB = true;
 
+    // Method for creating new user, to be called from DBStudent / DBDonor exclusively
     protected DBUser() {
-        this.existsInDB = false;
         this.doc = new Document();
-        // TODO (no default automatic mode, set to automatic after all fields are instantiated)
+        this.existsInDB = false;
     }
 
-    public DBUser(ID mode, String id) {
-        this(mode, id, DBWriteMode.MANUAL);
-    }
-
-    public DBUser(ID mode, String id, DBWriteMode writeMode) {
-        this.writeMode = writeMode;
+    /**
+     * Loads a user from the database. Call {@link #doesExistInDB()}
+     * after loading to make sure that the user exists
+     */
+    public DBUser(Id mode, String id) {
+        if (mode == Id.EMAIL)
+            id = id.toLowerCase();
+        
         this.doc = db.getDocumentByField(mode.key, id);
+        if (this.doc == null)
+            existsInDB = false;
     }
 
+    /**
+     * Sets a field in the database, for internal use only
+     * Use {@link #set(DBUserField, Object)} for external, safe use
+     */
     protected void set(String field, Object value) {
         String[] path = field.split("/");
 
@@ -42,21 +52,21 @@ public abstract class DBUser implements DBInstance {
             throw new IllegalArgumentException("Path " + field + " contains two sub-objects." +
                     "Try limiting yourself to one object; if you can't, talk to Philipp to expand functionality.");
 
-        if (writeMode == DBWriteMode.AUTOMATIC);
+        if (writeMode == DBWriteMode.AUTOMATIC)
             write(); // TODO write the entire document, or just write differences since last write
                     // maybe keep track of changes in a separate document and flush after every write
                     // or construct bson update command as you go
     }
 
+    /**
+     * Sets a field defined in {@link DBUserField} to {@param value}
+     */
     public void set(DBUserField field, Object value) {
         // _id is read only
-        if (field == DBUserField.ID)
+        if (field == ID)
             throw new IllegalArgumentException("Cannot set the _id value for a user." +
                     "It is generated automatically and read only");
-        // makes sure that type matches
-        /**if(!((Class) field.getType()).isInstance(value))
-            throw new IllegalArgumentException("Cannot set " + value.getClass() + " as value for field "
-                    + field.getKey() + ", expected " + field.getType());*/ // TODO do we need to specify and check type on every interaction ?
+
         set(field.getKey(), value);
     }
 
@@ -64,33 +74,58 @@ public abstract class DBUser implements DBInstance {
         return doc.get(key);
     }
 
+    /**
+     * Returns whether the current {@link DBUser} instance is
+     * in the database. False when (1) the user was just created or
+     * (2) a user couldn't be found in the database
+     */
+    public boolean doesExistInDB() {
+        return existsInDB;
+    }
+
+    /**
+     * Manually writes the current user to the database
+     */
+    public void write() {
+        if (!existsInDB) {
+            db.insertNew(doc);
+            doc = null; // New user not be used after initial write to database, reload by instantiating
+        } else
+            db.update(doc);
+    }
+
+    /**
+     * Returns the current write mode
+     */
     public DBWriteMode getWriteMode() {
         return writeMode;
     }
 
+    /**
+     * Sets a new write mode, and writes if new
+     * write mode is automatic
+     */
     public void setWriteMode(DBWriteMode newMode) {
+        if (!existsInDB)
+            throw new IllegalArgumentException("Write mode cannot be changed before user is in the database");
         if (writeMode != DBWriteMode.AUTOMATIC && newMode == DBWriteMode.AUTOMATIC)
             write();
         writeMode = newMode;
     }
 
-    public void write() {
-        if (!existsInDB)
-            db.collection.insertOne(doc); // TODO load id back in from database, also change this
-        else {
-            // TODO plz fix, very bad, no filters outside of dbinterface class
-            db.collection.findOneAndReplace(com.mongodb.client.model.Filters.eq("_id", doc.get(DBUserField.ID)), doc);
-        }
-    }
-
-    public static enum ID {
-        USER_ID("_id"),
-        AUTH_TOKEN("auth_token"),
-        EMAIL("email");
+    /**
+     * An enum that specifies which unique identifier
+     * is used to load the user from the database
+     * (object id, auth token, email)
+     */
+    public static enum Id {
+        USER_ID(ID.getKey()),
+        AUTH_TOKEN(AUTH_TOKENS.getKey()),
+        EMAIL(DBUserField.EMAIL.getKey());
 
         private String key;
 
-        ID(String keyName) {
+        Id(String keyName) {
             this.key = keyName;
         }
 

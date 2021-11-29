@@ -2,15 +2,17 @@ package ac.brunel.techdon.util.db.fields;
 
 import java.util.List;
 
-public enum DBUserField implements DBFields {
+public enum DBUserField implements DBField {
 
     ID("_id", String.class),
-    FIRST_NAME("firstName", String.class),
-    LAST_NAME("lastName", String.class),
-    ROLE("role", String.class),
+    USER_ROLE("user_type", String.class),
+    EMAIL("email", String.class),
+    PASSWORD_HASH("password_hash", String.class),
+    PASSWORD_SALT("password_salt", String.class),
     CREATION_DATE("creationDate", Long.class),
     AUTH_TOKENS("auth_list", List.class),
-    EMAIL("email", String.class),
+    FIRST_NAME("firstName", String.class),
+    LAST_NAME("lastName", String.class),
     PHONE("phone", String.class),
     ADDRESS("address", List.class);
 

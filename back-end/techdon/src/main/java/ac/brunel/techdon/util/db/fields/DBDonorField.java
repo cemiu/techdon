@@ -1,6 +1,6 @@
 package ac.brunel.techdon.util.db.fields;
 
-public enum DBDonorField implements DBFields {
+public enum DBDonorField implements DBField {
 
     ; // TODO add fields ?
 
