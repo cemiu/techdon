@@ -5,9 +5,16 @@ import ac.brunel.techdon.util.db.fields.DBField;
 public interface DBInstance {
 
     public DBWriteMode getWriteMode();
+
     public void setWriteMode(DBWriteMode newMode);
+
     public void write();
+
     public Object get(String key);
+
+    public default Object get(DBField field) {
+        return get(field.getKey());
+    }
 
     /**
      * Returns value of specified types
@@ -17,6 +24,10 @@ public interface DBInstance {
         if(!t.isInstance(obj))
             return null;
         return t.cast(obj);
+    }
+
+    public default <T> T get(DBField field, Class<T> t) {
+        return get(field.getKey(), t);
     }
 
     public default String getString(String key) {

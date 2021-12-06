@@ -6,13 +6,14 @@ import ac.brunel.techdon.util.db.fields.DBUserField;
 import ac.brunel.techdon.util.db.support.DBInstance;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 public abstract class DBUser implements DBInstance {
 
-    private static final DBInterface db = new DBInterface("users");
+    public static final DBInterface db = new DBInterface("users"); // change later
 
     private DBWriteMode writeMode = DBWriteMode.MANUAL;
-    private Document doc;
+    public Document doc;
     private boolean existsInDB = true;
 
     // Method for creating new user, to be called from DBStudent / DBDonor exclusively
@@ -28,10 +29,16 @@ public abstract class DBUser implements DBInstance {
     public DBUser(Id mode, String id) {
         if (mode == Id.EMAIL)
             id = id.toLowerCase();
-        
+
         this.doc = db.getDocumentByField(mode.key, id);
         if (this.doc == null)
             existsInDB = false;
+    }
+
+    protected ObjectId getId() {
+        if (!existsInDB)
+            return null;
+        return (ObjectId) get(ID);
     }
 
     /**

@@ -4,31 +4,29 @@ import java.util.List;
 
 public enum DBUserField implements DBField {
 
-    ID("_id", String.class),
-    USER_ROLE("user_type", String.class),
-    EMAIL("email", String.class),
-    PASSWORD_HASH("password_hash", String.class),
-    PASSWORD_SALT("password_salt", String.class),
-    CREATION_DATE("creationDate", Long.class),
-    AUTH_TOKENS("auth_list", List.class),
-    FIRST_NAME("firstName", String.class),
-    LAST_NAME("lastName", String.class),
-    PHONE("phone", String.class),
-    ADDRESS("address", List.class);
+    ID("_id"), // objectId, auto-generated
+    USER_ROLE("user_type"), // string, (student / donor, admin)
+    EMAIL("email"), // string
+    EMAIL_HAS_BEEN_VERIFIED("email_has_been_verified"),
+    EMAIL_UPDATED_UNVERIFIED("email_updated_unverified"), // set when user updates their email
+                                                              // moved to "email" field upon verification 
+    PASSWORD_HASH("password_hash"), // string, sha256 (?)
+    PASSWORD_SALT("password_salt"), // string, uuid-4
+    CREATION_DATE("creation_date"), // long, unix time
+    AUTH_TOKENS("auth_list"), // List<String>
+    FIRST_NAME("first_name"), // string
+    LAST_NAME("last_name"), // string
+    PHONE("phone"), // string
+    ADDRESS("address"); // List<String>
 
     private String key;
-    private Class type;
 
-    <T> DBUserField(String key, T t) {
+    DBUserField(String key) {
         this.key = key;
-        this.type = (Class) t;
     }
 
     public String getKey() {
         return key;
     }
 
-    public <T> T getType() {
-        return (T) type;
-    }
 }
