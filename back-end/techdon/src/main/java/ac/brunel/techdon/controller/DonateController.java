@@ -10,7 +10,7 @@ public class DonateController {
 
     @PostMapping("donate/device/new")
     public String donateDeviceNew(){
-        return null;
+        return "services"; // NOTE - i am not sure yet of what this oes i will ask ahmed for more info , THOY
 //        end point to donate a new device - check documentation for more info on inputs / outputs expected
     }
     @PostMapping("/donate/device/listedDevices")

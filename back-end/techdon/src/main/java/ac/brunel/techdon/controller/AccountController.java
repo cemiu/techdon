@@ -1,6 +1,10 @@
 package ac.brunel.techdon.controller;
 
 import org.springframework.web.bind.annotation.*;
+// NOTE
+//I HAVE ADDED ALL END POINTS TO THE FRONT END BUT YET THERE IS A FEW
+// THINGS LEFT TO DO AS I AM NOT 100% SURE ON A FEW OF THE FRONT END WORK I WILL SPEAK TO AHEMAD
+// THANK YOU THOY - PLZ DM OR EMAIL ME FOR MORE INFO
 
 @RestController
 public class AccountController {
@@ -12,13 +16,13 @@ public class AccountController {
 
     @PostMapping ("account/register")
     public String accountRegister(){
-        return null;
+        return "register";
 //        end point to register an account - check documentation for more info on inputs / outputs expected
 
     }
     @GetMapping("account/login")
     public String accountLogin(){
-        return null;
+        return "sa";
 //         End point to Login in - check documentation for more info on inputs / outputs expected
     }
     @GetMapping("account/logout")
@@ -33,7 +37,7 @@ public class AccountController {
     }
     @RequestMapping("account/verifyEmail")
     public String accountVerifyEmail(){
-        return null;
+        return "email";
 //         End point to VerifyEmail - check documentation for more info on inputs / outputs expected
     }
     @RequestMapping("account/settings/get")
