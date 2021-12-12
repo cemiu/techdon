@@ -15,21 +15,6 @@ import java.util.ArrayList;
 
 class DBInterface {
 
-    // TODO REMOVE THIS BEFORE MERGING TO MASTER BRANCH
-    public static void main(String[] args) {
-        DBInterface i = new DBInterface("users");
-        // resolves user by device id
-        // is it possible to just get a single element of the device array back ?
-        // or is it necessary to iterate over the entire array to find specific device
-        // .. maybe devices should be stored in a separate list, with their owning user being a foreign key ?
-        Document a = i.collection.find(eq("donated_devices.device_id", new ObjectId("61ab77b40be1bf0adf193d9a"))).first();
-        //System.out.println(a.get("donated_devices"));
-        //ArrayList<Document> b = (ArrayList<Document>) a.get("donated_devices");
-        //for (Document d: b) {
-        //    System.out.println(d.toJson());
-        //}
-    }
-
     private static MongoClient client;
     private static MongoDatabase database;
 
@@ -62,11 +47,24 @@ class DBInterface {
      * Updates a document in the collection by matching _id
      */
     public void update(Document doc) {
-        update(doc.getString("_id"), doc);
+        update(doc.getObjectId("_id"), doc);
     }
 
-    private void update(String id, Document doc) {
+    private void update(ObjectId id, Document doc) {
         collection.findOneAndReplace(eq("_id", id), doc);
+    }
+
+    /**
+     * Takes in a remote document and uses its _id
+     * field to find and delete a document from the remote
+     * collection
+     */
+    public void delete(Document doc) {
+        delete(doc.getString("_id"));
+    }
+
+    public void delete(String id) {
+        collection.findOneAndDelete(eq("_id", id)); // TODO does matching work with string id ?
     }
 
     /**
@@ -87,9 +85,6 @@ class DBInterface {
     private void query(String action, ObjectId id, String field, Object value) {
         Document query = new Document("$"+action , new Document(field, value));
         collection.updateOne(eq("_id", id), query);
-        //System.out.println(query.toJson());
-        //System.out.println(id);
-        //System.out.println(collection.find(eq("_id", id)).first().toJson());
     }
 
     /**

@@ -1,6 +1,7 @@
 package ac.brunel.techdon.util.db.support;
 
 import ac.brunel.techdon.util.db.fields.DBField;
+import org.bson.types.ObjectId;
 
 public interface DBInstance {
 
@@ -21,7 +22,7 @@ public interface DBInstance {
      */
     public default <T> T get(String key, Class<T> t) {
         Object obj = get(key);
-        if(!t.isInstance(obj))
+        if(obj == null || !t.isInstance(obj))
             return null;
         return t.cast(obj);
     }
@@ -46,12 +47,28 @@ public interface DBInstance {
         return getInt(field.getKey());
     }
 
+    public default Long getLong(String key) {
+        return get(key, Long.class);
+    }
+
+    public default Long getLong(DBField field) {
+        return getLong(field.getKey());
+    }
+
     public default Boolean getBoolean(String key) {
         return get(key, Boolean.class);
     }
 
     public default Boolean getBoolean(DBField field) {
         return getBoolean(field.getKey());
+    }
+
+    public default ObjectId getObjectId(String key) {
+        return get(key, ObjectId.class);
+    }
+
+    public default ObjectId getObjectId(DBField field) {
+        return getObjectId(field.getKey());
     }
 
 }

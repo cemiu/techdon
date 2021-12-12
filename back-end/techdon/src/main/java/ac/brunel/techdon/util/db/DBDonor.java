@@ -1,7 +1,6 @@
 package ac.brunel.techdon.util.db;
 
 import static ac.brunel.techdon.util.db.fields.DBDonorField.*;
-import static ac.brunel.techdon.util.db.fields.DBDonorField.DeviceField.*;
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 
 import ac.brunel.techdon.device.Device;
@@ -45,56 +44,6 @@ public class DBDonor extends DBUser {
     }
 
     /**
-     * Takes in a new device and adds it to the instanced
-     * donor's list of donated devices
-     */
-    public void addDevice(Device device) {
-        if (device.getDeviceId() == null)
-            throw new IllegalArgumentException("Device ID has to be set before being added to DB"); // TODO does it?
-
-        if (!doesExistInDB())
-            throw new IllegalArgumentException("Cannot add device to user before they have been written to the DB");
-        // TODO take write mode into consideration (add device to query queue, and execute entire queue upon write())
-
-        db.push(getId(), DONATED_DEVICES, device.toDocument());
-    }
-
-    /**
-     * Takes in a device belonging to the instanced
-     * donor, and updates its values in the database.
-     * Returns whether operation was successful
-     */
-    public boolean updateDevice(Device device) {
-        if (device == null || device.getDeviceId() == null)
-            return false;
-
-        return true; // TODO
-    }
-
-    /**
-     * Takes in an object id of a device belonging to the instanced
-     * donor and attempts to delete the device.
-     * Returns whether the deletion was successful
-     */
-    public boolean deleteDevice(ObjectId deviceId) {
-        if (deviceId == null)
-            return false;
-
-        return true; // TODO attempt to delete device BELONGING TO CURRENT DONOR; return whether successful
-    }
-
-    /**
-     * Removes a device belonging to the user from the database
-     * Only the devices' IDs have to match
-     */
-    public boolean deleteDevice(Device device) {
-        if (device == null)
-            return false;
-
-        return deleteDevice(device.getDeviceId());
-    }
-
-    /**
      * Sets a field specified in {@link DBDonorField}
      * to a certain value
      */
@@ -110,14 +59,10 @@ public class DBDonor extends DBUser {
         if (doc == null)
             return null;
 
-        Object deviceListRaw = this.get(DONATED_DEVICES);
-        ArrayList<ObjectId> listOut = new ArrayList<>();
-        if (deviceListRaw == null)
-            return listOut;
+        // TODO ... query devices collection by donor foreign key & compile resulting
+        // ids into arraylist
 
-        ArrayList<Document> deviceList = (ArrayList<Document>) deviceListRaw;
-        deviceList.forEach(x -> listOut.add((ObjectId) x.get(DEVICE_ID.getKey())));
-        return listOut;
+        return null;
     }
 
     /**

@@ -1,54 +1,53 @@
 package ac.brunel.techdon.util.db;
 
-import static ac.brunel.techdon.util.db.fields.DBUserField.*;
-
-import ac.brunel.techdon.util.db.fields.DBUserField;
+import ac.brunel.techdon.util.db.fields.DBDeviceField;
 import ac.brunel.techdon.util.db.support.DBInstance;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-public abstract class DBUser implements DBInstance {
+import java.util.NoSuchElementException;
 
-    public static final DBInterface db = new DBInterface("users");
+import static ac.brunel.techdon.util.db.fields.DBDeviceField.*;
+
+public class DBDevice  implements DBInstance {
+
+    public static final DBInterface db = new DBInterface("devices");
 
     private DBWriteMode writeMode = DBWriteMode.MANUAL;
     public Document doc;
     private boolean existsInDB = true;
 
-    /**
-     * Method for creating new user.
-     * To be called from DBStudent / DBDonor exclusively
-     */
-    protected DBUser() {
-        this.existsInDB = false;
-
-        this.doc = new Document();
+    public DBDevice() {
+        existsInDB = false;
+        doc = new Document();
         doc.put("_id", new ObjectId());
     }
 
-    /**
-     * Loads a user from the database. Call {@link #doesExistInDB()}
-     * after loading to make sure that the user exists
-     */
-    public DBUser(Id mode, String id) {
-        if (mode == Id.EMAIL)
-            id = id.toLowerCase();
+    public DBDevice(String deviceId) {
+        this(new ObjectId(deviceId));
+    }
 
-        this.doc = db.getDocumentByField(mode.key, id);
+    /**
+     * Loads a device from the database. Call {@link #doesExistInDB()}
+     * after loading to make sure that the device loaded correctly
+     */
+    public DBDevice(ObjectId deviceId) {
+        this.doc = db.getDocumentByField("_id", deviceId);
         if (this.doc == null)
             existsInDB = false;
     }
 
-    protected ObjectId getId() {
-        if (!existsInDB)
-            return null;
-        return (ObjectId) get(ID);
+    /**
+     * Resolves an object, given a field
+     */
+    public Object get(String key) {
+        return doc.get(key);
     }
 
     /**
      * Sets a field in the database, for internal use only
-     * Use {@link #set(DBUserField, Object)} for external, safe use
+     * Use {@link #set(DBDeviceField, Object)} for external, safe use
      */
     protected void set(String field, Object value) {
         String[] path = field.split("/");
@@ -66,16 +65,15 @@ public abstract class DBUser implements DBInstance {
 
         if (writeMode == DBWriteMode.AUTOMATIC)
             write(); // TODO write the entire document, or just write differences since last write
-                    // maybe keep track of changes in a separate document and flush after every write
-                    // or construct bson update command as you go
+        // TODO rewrite method to make prettier
     }
 
     /**
-     * Sets a field defined in {@link DBUserField} to {@param value}
+     * Sets a field defined in {@link DBDeviceField} to {@param value}
      */
-    public void set(DBUserField field, Object value) {
+    public void set(DBDeviceField field, Object value) {
         // _id is read only
-        if (field == ID)
+        if (field == DEVICE_ID)
             throw new IllegalArgumentException("Cannot set the _id value for a user." +
                     "It is generated automatically and read only");
 
@@ -83,10 +81,14 @@ public abstract class DBUser implements DBInstance {
     }
 
     /**
-     * Resolves an object, given a field
+     * Removes the specified field from the remote object
      */
-    public Object get(String key) {
-        return doc.get(key);
+    public void remove(DBDeviceField field) {
+        doc.remove(field.getKey());
+
+        // TODO update single value instead of entire document
+        if (writeMode == DBWriteMode.AUTOMATIC)
+            write();
     }
 
     /**
@@ -98,14 +100,12 @@ public abstract class DBUser implements DBInstance {
         return existsInDB;
     }
 
-    /**
-     * Manually writes the current user to the database
-     */
     public void write() {
         if (!existsInDB) {
             db.insertNew(doc);
+            existsInDB = true;
         } else
-            db.update(doc);
+            db.update(doc); // TODO make more sophisticated, with update queue
     }
 
     /**
@@ -116,35 +116,21 @@ public abstract class DBUser implements DBInstance {
     }
 
     /**
-     * Sets a new write mode, and writes if new
-     * write mode is automatic
+     * Changes the write mode, if the new write mode is automatic,
+     * it writes all unwritten changes to the database
      */
     public void setWriteMode(DBWriteMode newMode) {
-        // TODO only write if there is anything to write
+        // TODO only write, if there is anything to write (once write queue has
+        //  been implemented)
         if (writeMode != DBWriteMode.AUTOMATIC && newMode == DBWriteMode.AUTOMATIC)
             write();
         writeMode = newMode;
     }
 
-    /**
-     * An enum that specifies which unique identifier
-     * is used to load the user from the database
-     * (object id, auth token, email)
-     */
-    public enum Id {
-        USER_ID(ID.getKey()),
-        AUTH_TOKEN(AUTH_TOKENS.getKey()),
-        EMAIL(DBUserField.EMAIL.getKey());
-
-        private final String key;
-
-        Id(String keyName) {
-            this.key = keyName;
-        }
-
-        private String getAuthField() {
-            return key;
-        }
+    public void delete() {
+        if (!existsInDB)
+            throw new IllegalArgumentException("Cannot delete a remote device object that is not in the database.");
+        db.delete(doc);
     }
 
 }

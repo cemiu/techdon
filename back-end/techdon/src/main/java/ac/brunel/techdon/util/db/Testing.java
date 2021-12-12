@@ -17,11 +17,8 @@ import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
 public class Testing {
 
     public static void main(String[] args) {
-        //loadDeviceById();
-        //createDummyDonor();
-        //createDummyStudent();
-        //addDeviceToDonor();
-        loadAllDevices();
+        //addDevice();
+        modifyDevice();
     }
 
     private static void loadAllDevices() {
@@ -34,16 +31,27 @@ public class Testing {
         System.out.println(deviceDoc);
     }
 
-    private static void addDeviceToDonor() {
-        DBDonor donor = new DBDonor(DBUser.Id.AUTH_TOKEN, "R9SAUCVDWEYGZH2K4M5N7Q8R9TBUCVEXFYG2J3K4N6P7Q9SATBUDWEXFZH");
-        //System.out.println(donor.getString(FIRST_NAME));
+    private static void addDevice() {
+        Device device = new Device(new ObjectId(), DeviceType.IPAD, "iPad Air");
+        device.setDescription("Good condition. For collection only, in Uxbridge");
+        device.assignToStudent(new ObjectId());
 
-        Device device = new Device(DeviceType.LAPTOP, "HP, 1 TB storage, bought 2017");
+    }
 
-        DBStudent student = new DBStudent(DBUser.Id.EMAIL, "student@gmail.com");
-        device.setAssignedStudent(student.getId());
+    private static void modifyDevice() {
+        Device device = new Device("61b641f463ef9f620f9d8a21");
+        System.out.println("1: " + device.getName());
+        System.out.println("2: " + device.getDescription());
+        System.out.println("3: " + device.isAssigned());
+        System.out.println("4: " + device.getAssignedDate());
 
-        donor.addDevice(device);
+        device.unassign();
+        device.removeDescription();
+
+        System.out.println("5: " + device.getName());
+        System.out.println("6: " + device.getDescription());
+        System.out.println("7: " + device.isAssigned());
+        System.out.println("8: " + device.getAssignedDate());
     }
 
     private static void loadDummyStudent() {
