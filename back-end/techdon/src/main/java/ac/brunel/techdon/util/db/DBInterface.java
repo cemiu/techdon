@@ -5,6 +5,7 @@ import static com.mongodb.client.model.Filters.*;
 import ac.brunel.techdon.util.db.fields.DBDonorField;
 import ac.brunel.techdon.util.db.fields.DBField;
 import ac.brunel.techdon.util.db.support.DBPreferences;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -18,9 +19,21 @@ class DBInterface {
     private static MongoClient client;
     private static MongoDatabase database;
 
-    String collectionName;
-    public MongoCollection<Document> collection;
+    private String collectionName;
+    private MongoCollection<Document> collection;
 
+    /**
+     * For testing purposes only,
+     * TODO to be removed once not needed
+     */
+    protected MongoCollection<Document> getCollection() {
+        return collection;
+    }
+
+    /**
+     * Initializes a new interface for
+     * specified collection
+     */
     public DBInterface(String collection) {
         this.collectionName = collection;
         this.collection = database.getCollection(collection);
@@ -41,6 +54,13 @@ class DBInterface {
             throw new IllegalArgumentException("Cannot lookup DB Document in " +
                     collectionName + " with value " + id + " in field " + field);
         return collection.find(eq(field, id)).first();
+    }
+
+    public FindIterable<Document> getDocumentsByField(String field, ObjectId id) {
+        if (field == null || id == null || field.equals(""))
+            throw new IllegalArgumentException("Cannot lookup DB Document in " +
+                    collectionName + " with value " + id + " in field " + field);
+        return collection.find(eq(field, id));
     }
 
     /**

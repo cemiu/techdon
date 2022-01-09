@@ -3,16 +3,18 @@ package ac.brunel.techdon.util.db;
 import ac.brunel.techdon.util.db.fields.DBDeviceField;
 import ac.brunel.techdon.util.db.support.DBInstance;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
+import com.mongodb.client.FindIterable;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 import static ac.brunel.techdon.util.db.fields.DBDeviceField.*;
 
 public class DBDevice  implements DBInstance {
 
-    public static final DBInterface db = new DBInterface("devices");
+    private static final DBInterface db = new DBInterface("devices");
 
     private DBWriteMode writeMode = DBWriteMode.MANUAL;
     public Document doc;
@@ -127,10 +129,24 @@ public class DBDevice  implements DBInstance {
         writeMode = newMode;
     }
 
+    /**
+     * Deletes the device from the database
+     */
     public void delete() {
         if (!existsInDB)
             throw new IllegalArgumentException("Cannot delete a remote device object that is not in the database.");
         db.delete(doc);
+        doc = null;
+    }
+
+    public static ArrayList<String> getDevicesByUser(ObjectId userId, boolean isDonor) {
+        FindIterable<Document> items = DBDevice.db.getDocumentsByField(
+                isDonor ? DEVICE_DONOR.getKey() : DEVICE_ASSIGNED_STUDENT.getKey(), userId);
+
+        ArrayList<String> deviceIds = new ArrayList<>();
+        items.forEach(doc -> deviceIds.add(doc.getObjectId(DEVICE_ID.getKey()).toString()));
+
+        return deviceIds;
     }
 
 }

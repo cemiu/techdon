@@ -8,6 +8,9 @@ import org.bson.types.ObjectId;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 public class Device {
 
@@ -72,9 +75,9 @@ public class Device {
      * Set the userId to the user's object Id, and isDonor to true
      * or false depending on whether the queried user is a student or donor
      */
-    public Device(String deviceId, String userId, boolean isDonor) {
+    public Device(String deviceId, ObjectId userId, boolean isDonor) {
         this(new ObjectId(deviceId));
-        if (!new ObjectId(userId).equals(isDonor ? DEVICE_DONOR : DEVICE_ASSIGNED_STUDENT))
+        if (!userId.equals(isDonor ? donorId : assignedStudent))
             throw new AccessDeniedException("Tried to load device " + deviceId +
                     " for " + (isDonor ? "donor" : "student") + " " + userId +
                     ", but it does not belong to them.");
@@ -91,7 +94,7 @@ public class Device {
 
         // throws error if no device exists
         if (!dbDevice.doesExistInDB())
-            throw new IllegalArgumentException("Tried to load device with id " + deviceId +
+            throw new NoSuchElementException("Tried to load device with id " + deviceId +
                     "but could not find it in the database");
 
         // populates all values
@@ -274,6 +277,26 @@ public class Device {
     public void removeDescription() {
         description = null;
         dbDevice.remove(DEVICE_DESCRIPTION);
+    }
+
+    public void deleteDevice() {
+        dbDevice.delete();
+    }
+
+    /**
+     * Method that takes in a donor's object id and returns
+     * a list of all device ids donated by them, in string form
+     */
+    public static ArrayList<String> getDevicesByDonor(ObjectId donorId) {
+        return DBDevice.getDevicesByUser(donorId, true);
+    }
+
+    /**
+     * Method that takes in a student's object id and returns
+     * a list of all device ids offered to or accepted by them
+     */
+    public static ArrayList<String> getDevicesByStudent(ObjectId studentId) {
+        return DBDevice.getDevicesByUser(studentId, false);
     }
 
 }

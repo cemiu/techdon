@@ -14,7 +14,12 @@ import static com.mongodb.client.model.Filters.*;
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
 
-public class Testing {
+/**
+ * This class contains some methods used to test
+ * the functionality of the database interface
+ * To be removed once interface development has finished
+ */
+public class DatabaseInterfaceTests {
 
     public static void main(String[] args) {
         //addDevice();
@@ -24,11 +29,6 @@ public class Testing {
     private static void loadAllDevices() {
         DBDonor donor = new DBDonor(DBUser.Id.AUTH_TOKEN, "R9SAUCVDWEYGZH2K4M5N7Q8R9TBUCVEXFYG2J3K4N6P7Q9SATBUDWEXFZH");
         System.out.println(donor.getDeviceList());
-    }
-
-    private static void loadDeviceById() {
-        Document deviceDoc = DBDonor.db.collection.find(eq("device_id", new ObjectId("61a4ee7d430a0b30208faca1"))).first();
-        System.out.println(deviceDoc);
     }
 
     private static void addDevice() {

@@ -1,5 +1,8 @@
 package ac.brunel.techdon.device;
 
+import javax.lang.model.UnknownEntityException;
+import javax.lang.model.element.UnknownElementException;
+
 public enum DeviceType {
 
     // TODO expand list with all options offered on our platform
@@ -36,7 +39,7 @@ public enum DeviceType {
             case "hardDrive":
                 return HARD_DRIVE;
             default:
-                return null;
+                throw new IllegalArgumentException(type + " is not a valid device type.");
         }
     }
 
