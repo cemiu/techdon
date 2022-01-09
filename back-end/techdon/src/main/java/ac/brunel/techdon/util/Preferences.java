@@ -1,13 +1,9 @@
 package ac.brunel.techdon.util;
 
-import org.bson.BsonDocumentReader;
 import org.bson.Document;
 import org.bson.json.JsonParseException;
-import org.bson.json.JsonWriter;
-import org.bson.json.JsonWriterSettings;
 
 import java.io.*;
-import java.nio.Buffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -81,7 +77,8 @@ public class Preferences {
         // parses json from file
         String jsonString = null;
         try {
-            jsonString = new String(Files.readAllBytes(Paths.get(PREF_URI)), StandardCharsets.UTF_8);
+            jsonString = Files.readString(Paths.get(PREF_URI));
+            // jsonString = new String(Files.readAllBytes(Paths.get(PREF_URI)), StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.err.println("Failed to read preference file at: " + PREF_URI);
             e.printStackTrace();

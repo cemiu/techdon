@@ -2,7 +2,6 @@ package ac.brunel.techdon.util.db;
 
 import static com.mongodb.client.model.Filters.*;
 
-import ac.brunel.techdon.util.db.fields.DBDonorField;
 import ac.brunel.techdon.util.db.fields.DBField;
 import ac.brunel.techdon.util.db.support.DBPreferences;
 import com.mongodb.client.FindIterable;
@@ -12,15 +11,13 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
-
 class DBInterface {
 
-    private static MongoClient client;
-    private static MongoDatabase database;
+    private static final MongoClient client;
+    private static final MongoDatabase database;
 
-    private String collectionName;
-    private MongoCollection<Document> collection;
+    private final String collectionName;
+    private final MongoCollection<Document> collection;
 
     /**
      * For testing purposes only,
@@ -56,11 +53,15 @@ class DBInterface {
         return collection.find(eq(field, id)).first();
     }
 
-    public FindIterable<Document> getDocumentsByField(String field, ObjectId id) {
+    private FindIterable<Document> getDocumentsByField(String field, ObjectId id) {
         if (field == null || id == null || field.equals(""))
             throw new IllegalArgumentException("Cannot lookup DB Document in " +
                     collectionName + " with value " + id + " in field " + field);
         return collection.find(eq(field, id));
+    }
+
+    public FindIterable<Document> getDocumentsByField(DBField field, ObjectId id) {
+        return getDocumentsByField(field.getKey(), id);
     }
 
     /**
@@ -80,10 +81,10 @@ class DBInterface {
      * collection
      */
     public void delete(Document doc) {
-        delete(doc.getString("_id"));
+        delete(doc.getObjectId("_id"));
     }
 
-    public void delete(String id) {
+    public void delete(ObjectId id) {
         collection.findOneAndDelete(eq("_id", id)); // TODO does matching work with string id ?
     }
 

@@ -9,6 +9,6 @@ package ac.brunel.techdon.util.db.support;
 public enum DBWriteMode {
 
     AUTOMATIC,
-    MANUAL;
+    MANUAL
 
 }

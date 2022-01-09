@@ -1,6 +1,7 @@
 package ac.brunel.techdon.util.db;
 
 import ac.brunel.techdon.util.db.fields.DBDeviceField;
+import ac.brunel.techdon.util.db.fields.DBField;
 import ac.brunel.techdon.util.db.support.DBInstance;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
 import com.mongodb.client.FindIterable;
@@ -8,7 +9,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
+import java.util.List;
 
 import static ac.brunel.techdon.util.db.fields.DBDeviceField.*;
 
@@ -139,14 +140,21 @@ public class DBDevice  implements DBInstance {
         doc = null;
     }
 
-    public static ArrayList<String> getDevicesByUser(ObjectId userId, boolean isDonor) {
-        FindIterable<Document> items = DBDevice.db.getDocumentsByField(
-                isDonor ? DEVICE_DONOR.getKey() : DEVICE_ASSIGNED_STUDENT.getKey(), userId);
+    /**
+     * Gets all devices associated with specified
+     * donor / student and returns a list containing
+     * their IDs
+     */
+    public static List<ObjectId> getDevicesByUser(ObjectId userId, boolean isDonor) {
+        DBField field = isDonor ? DEVICE_DONOR : DEVICE_ASSIGNED_STUDENT;
+        FindIterable<Document> iterable = db.getDocumentsByField( field, userId);
+        List<ObjectId> list = new ArrayList<>();
 
-        ArrayList<String> deviceIds = new ArrayList<>();
-        items.forEach(doc -> deviceIds.add(doc.getObjectId(DEVICE_ID.getKey()).toString()));
+        // transforms iterable of device docs into list of device ids
+        iterable.map(doc -> doc.getObjectId(DEVICE_ID.getKey()))
+                .forEach(list::add);
 
-        return deviceIds;
+        return list;
     }
 
 }

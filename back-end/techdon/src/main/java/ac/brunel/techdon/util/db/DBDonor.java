@@ -5,12 +5,9 @@ import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 
 import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.util.db.fields.DBDonorField;
-import ac.brunel.techdon.util.db.fields.DBStudentField;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 public class DBDonor extends DBUser {
@@ -52,17 +49,14 @@ public class DBDonor extends DBUser {
     }
 
     /**
-     * Returns ArrayList containing object ids of
+     * Returns List containing object ids of
      * all devices donated by DBDonor instance
      */
-    public ArrayList<ObjectId> getDeviceList() {
+    public List<ObjectId> getDeviceList() {
         if (doc == null)
             return null;
 
-        // TODO ... query devices collection by donor foreign key & compile resulting
-        // ids into arraylist
-
-        return null;
+        return Device.getDeviceIdsByDonor(getId());
     }
 
     /**
@@ -70,7 +64,7 @@ public class DBDonor extends DBUser {
      * it is owned by the currently instantiated donor
      */
     public boolean ownsDevice(ObjectId deviceId) {
-        ArrayList<ObjectId> deviceIds = getDeviceList();
+        List<ObjectId> deviceIds = getDeviceList();
         if (deviceId == null || deviceIds == null)
             return false;
 

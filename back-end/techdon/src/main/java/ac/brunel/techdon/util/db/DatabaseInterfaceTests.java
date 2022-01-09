@@ -10,7 +10,6 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.UUID;
 
-import static com.mongodb.client.model.Filters.*;
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
 
@@ -19,6 +18,7 @@ import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
  * the functionality of the database interface
  * To be removed once interface development has finished
  */
+@SuppressWarnings("unused")
 public class DatabaseInterfaceTests {
 
     public static void main(String[] args) {
@@ -61,7 +61,7 @@ public class DatabaseInterfaceTests {
         ObjectId id = (ObjectId) new DBStudent(DBUser.Id.EMAIL, "test@gmail.com").get(ID);
         System.out.println(id);
         System.out.println(id.toString());
-        System.out.println(id.equals("61a4340cbc906233499b7955"));
+        // System.out.println(id.equals("61a4340cbc906233499b7955")); -> contradiction
         System.out.println(id.equals(new ObjectId("61a4340cbc906233499b7955")));
         System.out.println(id.getDate());
     }
@@ -74,7 +74,7 @@ public class DatabaseInterfaceTests {
         donor.set(PASSWORD_HASH, HashingHelper.getHash("abc123", salt));
         donor.set(PASSWORD_SALT, salt);
         donor.set(CREATION_DATE, Instant.now().getEpochSecond());
-        donor.set(AUTH_TOKENS, Arrays.asList("R9SAUCVDWEYGZH2K4M5N7Q8R9TBUCVEXFYG2J3K4N6P7Q9SATBUDWEXFZH"));
+        donor.set(AUTH_TOKENS, Arrays.asList("R9SAUCVDWEYGZH2K4M5N7Q8R9TBUCVEXFYG2J3K4N6P7Q9SATBUDWEXFZH", "R9SAUCVDWEYGZH2K4M5N7Q8R9TBUCVEXFYG2J3K4N6P7Q9SATBUDWEXFZI"));
         donor.set(FIRST_NAME, "Max");
         donor.set(LAST_NAME, "Abc");
         donor.set(PHONE, "+44 2467214156");
@@ -83,7 +83,6 @@ public class DatabaseInterfaceTests {
                 "Kingston Ln",
                 "UB8 3PH",
                 "Uxbridge"));
-
         donor.write();
     }
 
@@ -97,7 +96,7 @@ public class DatabaseInterfaceTests {
 
         student.set(CREATION_DATE, Instant.now().getEpochSecond());
         student.set(AUTH_TOKENS, Arrays.asList("FYH2J3K5N6P7R9SATBVDWEXGZH2J4M5N6Q8R9SBUCVDXFYGZJ3K4M6P7Q8",
-                "VEXFYG2J3K4M6P7Q8SATBUDEXFZH2J3M5N6P8R9SAUCVDWFYGZH2K4M5N7",
+                "VERIFY2J3K4M6P7Q8SATBUDEXFZH2J3M5N6P8R9SAUCVDWFYGZH2K4M5N7",
                 "UCVDXFYGZH3K4M5P7Q8RATBUCWEXFYH2J3K5N6P7R9SATCVDWEXGZH2J4M"));
         student.set(FIRST_NAME, "Joe");
         student.set(LAST_NAME, "Bloggs");
