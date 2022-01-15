@@ -8,11 +8,7 @@ import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.AssertTrue;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
@@ -35,7 +31,7 @@ public class DonorController {
      */
     @GetMapping (value = "/api/donor/device/listedDevices", produces="text/json")
     public ResponseEntity<String> donorListedDevices(
-            @RequestParam @NotBlank String authToken
+            @RequestParam String authToken
     ) {
         // TODO temp solution with DBDonor, while user object are still in development
         //  update to interact with account / donor object once implemented
@@ -58,7 +54,7 @@ public class DonorController {
      * end point to update the information of a donated device
      * check documentation for more info on inputs / outputs expected
      */
-    @RequestMapping("/api/donor/device/load")
+    @GetMapping("/api/donor/device/load")
     public String donorDeviceLoad() {
         return null;
     }
@@ -67,19 +63,17 @@ public class DonorController {
      * endpoint to remove a device which has been listed for donation
      * check documentation for more info on inputs / outputs expected
      */
-    @GetMapping (value = "/api/donor/device/remove")
+    @DeleteMapping (value = "/api/donor/device/remove")
     public ResponseEntity<String> donorDeviceRemove(
-            @RequestParam @NotEmpty String authToken,
-            @RequestParam @NotEmpty String deviceId
+            @RequestParam String authToken,
+            @RequestParam String deviceId
     ) {
         // TODO temp solution with DBDonor, while user object are still in development
         //  update to interact with account / donor object once implemented
 
-        // throws NoSuchElementException if auth token isn't valid for donor user
-        DBDonor donor;
         Device device;
         try {
-            donor = new DBDonor(DBUser.Id.AUTH_TOKEN, authToken); // invalid donor auth token
+            DBDonor donor = new DBDonor(DBUser.Id.AUTH_TOKEN, authToken); // invalid donor auth token
             ObjectId donorId = donor.getObjectId(ID);
             device = new Device(deviceId, donorId, true); // invalid device or user
         } catch (RuntimeException e) {
@@ -94,7 +88,7 @@ public class DonorController {
      * endpoint to change values of a device listed for donation
      * check documentation for more info on inputs / outputs expected
      */
-    @RequestMapping (value = "/api/donor/device/update", method = RequestMethod.POST)
+    @PostMapping (value = "/api/donor/device/update")
     public ResponseEntity<String> donorDeviceUpdate(
             @RequestParam(value = "authToken") String authToken,
             @RequestParam(value = "deviceId") String deviceId,
@@ -134,7 +128,7 @@ public class DonorController {
             safeName = deviceName;
         }
 
-        if (safeLocation != null) {
+        if (deviceLocation != null) {
             // TODO validate city or postcode
             boolean isValid = true; // (temp, remove later)
             if (!isValid)

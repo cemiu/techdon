@@ -4,6 +4,7 @@ import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.HashingHelper;
 import org.bson.Document;
+import org.bson.assertions.Assertions;
 import org.bson.types.ObjectId;
 
 import java.time.Instant;
@@ -22,8 +23,8 @@ import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
 public class DatabaseInterfaceTests {
 
     public static void main(String[] args) {
-        //addDevice();
-        modifyDevice();
+        addDevice();
+        //modifyDevice();
     }
 
     private static void loadAllDevices() {

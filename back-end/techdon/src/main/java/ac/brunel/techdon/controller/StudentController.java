@@ -4,8 +4,6 @@ import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBStudent;
 import ac.brunel.techdon.util.db.DBUser;
-import ac.brunel.techdon.util.db.fields.DBDonorField;
-import ac.brunel.techdon.util.db.fields.DBUserField;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +23,7 @@ public class StudentController {
      * endpoint to register an account
      * check documentation for more info on inputs / outputs expected
      */
-    @RequestMapping("/api/student/devices/loadPreferences")
+    @GetMapping("/api/student/devices/loadPreferences")
     public String studentDevicesLoadPreferences() {
         return null;
     }
@@ -34,7 +32,7 @@ public class StudentController {
      * endpoint to set preferences for which devices the students wants
      * check documentation for more info on inputs / outputs expected
      */
-    @RequestMapping("/api/student/devices/setPreferences")
+    @PostMapping("/api/student/devices/setPreferences")
     public String studentDevicesSetPreferences() {
         return null;
     }

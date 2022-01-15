@@ -11,21 +11,13 @@ import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-class DBInterface {
+public class DBInterface {
 
     private static final MongoClient client;
     private static final MongoDatabase database;
 
     private final String collectionName;
     private final MongoCollection<Document> collection;
-
-    /**
-     * For testing purposes only,
-     * TODO to be removed once not needed
-     */
-    protected MongoCollection<Document> getCollection() {
-        return collection;
-    }
 
     /**
      * Initializes a new interface for
@@ -118,6 +110,13 @@ class DBInterface {
     public boolean documentExists(String field, String value) {
         return getDocumentByField(field, value) != null;
     }
+
+    /**
+     * Empty method without return type used
+     * to initialize the connection to the database
+     * upon the launch of the app
+     */
+    public static void init() {}
 
     static {
         client = DBPreferences.getClient();

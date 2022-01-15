@@ -52,7 +52,7 @@ public class AccountController {
     }
 
 
-    @RequestMapping("/api/account/verifyEmail")
+    @PostMapping("/api/account/verifyEmail")
     public String accountVerifyEmail(){
         return "email";
 //         Endpoint to VerifyEmail - check documentation for more info on inputs / outputs expected
@@ -62,7 +62,7 @@ public class AccountController {
      * Endpoint to get a user's account settings
      * check documentation for more info on inputs / outputs expected
      */
-    @RequestMapping("/api/account/settings/get")
+    @GetMapping("/api/account/settings/get")
     public String accountSettingsGet(){
         return null;
     }

@@ -36,7 +36,7 @@ public class DBDonor extends DBUser {
         if (doesExistInDB() && getString(USER_ROLE).equals("donor"))
             return;
 
-        // donor couldn't be loaded
+        // user doesn't exist, or isn't a donor
         throw new NoSuchElementException("Authentication token is invalid for user class: donor");
     }
 
