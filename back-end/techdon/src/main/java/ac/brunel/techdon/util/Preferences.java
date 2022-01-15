@@ -1,13 +1,9 @@
 package ac.brunel.techdon.util;
 
-import org.bson.BsonDocumentReader;
 import org.bson.Document;
 import org.bson.json.JsonParseException;
-import org.bson.json.JsonWriter;
-import org.bson.json.JsonWriterSettings;
 
 import java.io.*;
-import java.nio.Buffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -19,7 +15,7 @@ import java.nio.file.Paths;
  */
 public class Preferences {
 
-    private static final int PREF_VERSION = 1;
+    private static final int PREF_VERSION = 2;
 
     private static final String APP_PATH = System.getProperty("user.home") + "/.techdon/";
     private static final String PREF_URI = APP_PATH + "pref.json";
@@ -28,6 +24,7 @@ public class Preferences {
 
     private static final Document PREFS;
     private static final Document DB_SETTINGS;
+    private static final Document EMAIL_SETTINGS;
 
     // getters for mongodb connection / auth details
     public static String getDbUser() {
@@ -45,6 +42,29 @@ public class Preferences {
     public static String getDbName() {
         return DB_SETTINGS.getString("mongodb_db_name");
     }
+
+    public static String getEmailHost() {
+        return EMAIL_SETTINGS.getString("smtp_host");
+    }
+
+    public static int getEmailPort() {
+        return EMAIL_SETTINGS.getInteger("smtp_port");
+    }
+
+    public static String getEmailUsername() {
+        return EMAIL_SETTINGS.getString("smtp_username");
+    }
+
+    public static String getEmailPassword() {
+        return EMAIL_SETTINGS.getString("smtp_password");
+    }
+
+    /**
+     * Empty method without return type used
+     * to load the preferences upon the launch
+     * of the app
+     */
+    public static void init() {}
 
     static {
         // creates template pref file, if none exists
@@ -65,6 +85,13 @@ public class Preferences {
                         "\t\t\"mongodb_password\": \"INSERT PASSWORD HERE\",\n" +
                         "\t\t\"mongodb_server_uri\": \"INSERT SERVER URI HERE\",\n" +
                         "\t\t\"mongodb_db_name\": \"TechDon\"\n" +
+                        "\t},\n" +
+
+                        "\t\"email_server_settings\": {\n" +
+                        "\t\t\"smtp_host\": \"INSERT HOST HERE\",\n" +
+                        "\t\t\"smtp_port\": 22,\n" +
+                        "\t\t\"smtp_username\": \"INSERT USERNAME HERE\",\n" +
+                        "\t\t\"smtp_password\": \"INSERT PASSWORD HERE\"\n" +
                         "\t}\n" +
                         "}\n");
                 writer.close();
@@ -74,14 +101,14 @@ public class Preferences {
                 System.exit(1);
             }
 
-            System.err.println("Please fill in the template preference file at: " +PREF_URI + ", and restart the server");
+            System.err.println("Please fill in the template preference file at: " + PREF_URI + ", and restart the server");
             System.exit(1);
         }
 
         // parses json from file
         String jsonString = null;
         try {
-            jsonString = new String(Files.readAllBytes(Paths.get(PREF_URI)), StandardCharsets.UTF_8);
+            jsonString = Files.readString(Paths.get(PREF_URI));
         } catch (IOException e) {
             System.err.println("Failed to read preference file at: " + PREF_URI);
             e.printStackTrace();
@@ -109,6 +136,7 @@ public class Preferences {
 
         PREFS = prefTemp;
         DB_SETTINGS = (Document) PREFS.get("mongo_db_settings");
+        EMAIL_SETTINGS = (Document) PREFS.get("email_server_settings");
         System.out.println("[TechDon] Finished loading preference file from: " + PREF_URI);
     }
 

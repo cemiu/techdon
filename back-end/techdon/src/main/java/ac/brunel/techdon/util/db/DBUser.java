@@ -10,7 +10,7 @@ import org.bson.types.ObjectId;
 
 public abstract class DBUser implements DBInstance {
 
-    public static final DBInterface db = new DBInterface("users");
+    private static final DBInterface db = new DBInterface("users");
 
     private DBWriteMode writeMode = DBWriteMode.MANUAL;
     public Document doc;

@@ -8,7 +8,7 @@ public enum DBDonorField implements DBField {
 
     DONATED_DEVICES("donated_devices"); // array of type Device
 
-    private String key;
+    private final String key;
 
     DBDonorField(String key) {
         this.key = key;

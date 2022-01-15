@@ -8,6 +8,10 @@ import org.bson.types.ObjectId;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 
 public class Device {
 
@@ -22,11 +26,13 @@ public class Device {
     private long listingDate;
 
     // optional
+    private String location; // only needed for in-person collection
     private String description;
     private ObjectId assignedStudent;
     private Long assignedDate;
     private boolean hasBeenClaimed;
 
+    @SuppressWarnings("unused")
     private Device() {}
 
     /**
@@ -41,6 +47,7 @@ public class Device {
         this.name = name;
         this.listingDate = Instant.now().getEpochSecond();
 
+        this.location = null;
         this.description = null;
 
         this.assignedStudent = null;
@@ -55,7 +62,7 @@ public class Device {
         dbDevice.set(DEVICE_NAME, name);
         dbDevice.set(DEVICE_LISTING_DATE, listingDate);
 
-        // skips values which are null
+        // skip values which are null
         dbDevice.setWriteMode(DBWriteMode.AUTOMATIC);
     }
 
@@ -72,9 +79,9 @@ public class Device {
      * Set the userId to the user's object Id, and isDonor to true
      * or false depending on whether the queried user is a student or donor
      */
-    public Device(String deviceId, String userId, boolean isDonor) {
+    public Device(String deviceId, ObjectId userId, boolean isDonor) {
         this(new ObjectId(deviceId));
-        if (!new ObjectId(userId).equals(isDonor ? DEVICE_DONOR : DEVICE_ASSIGNED_STUDENT))
+        if (!userId.equals(isDonor ? donorId : assignedStudent))
             throw new AccessDeniedException("Tried to load device " + deviceId +
                     " for " + (isDonor ? "donor" : "student") + " " + userId +
                     ", but it does not belong to them.");
@@ -91,7 +98,7 @@ public class Device {
 
         // throws error if no device exists
         if (!dbDevice.doesExistInDB())
-            throw new IllegalArgumentException("Tried to load device with id " + deviceId +
+            throw new NoSuchElementException("Tried to load device with id " + deviceId +
                     "but could not find it in the database");
 
         // populates all values
@@ -102,6 +109,7 @@ public class Device {
         name = dbDevice.getString(DEVICE_NAME);
 
         // optional, set to null if not found in db
+        location = dbDevice.getString(DEVICE_LOCATION);
         description = dbDevice.getString(DEVICE_DESCRIPTION);
         assignedStudent = dbDevice.getObjectId(DEVICE_ASSIGNED_STUDENT);
         if (assignedStudent == null) {
@@ -123,6 +131,7 @@ public class Device {
     /**
      * Returns the donor user's object id
      */
+    @SuppressWarnings("unused")
     public ObjectId getDonorId() {
         return donorId;
     }
@@ -142,14 +151,31 @@ public class Device {
     }
 
     /**
+     * Returns whether the device has a location
+     * for in-person collection
+     */
+    public boolean hasLocation() {
+        return location != null;
+    }
+
+    /**
+     * Returns the device's location.
+     * Returns null if no location is set
+     */
+    public String getLocation() {
+        return location;
+    }
+
+    /**
      * Returns whether the device has been given a description
      */
+    @SuppressWarnings("unused")
     public boolean hasDescription() {
         return description != null;
     }
 
     /**
-     * Return's the device's description.
+     * Returns the device's description.
      * Returns null if no description has been set
      */
     public String getDescription() {
@@ -168,6 +194,7 @@ public class Device {
      * Returns assigned student's object id
      * If the device is not assigned, returns null
      */
+    @SuppressWarnings("unused")
     public ObjectId getAssignedStudent() {
         return assignedStudent;
     }
@@ -187,6 +214,7 @@ public class Device {
      * Returns whether the device has been claimed by a
      * student. If no student is assigned, returns false
      */
+    @SuppressWarnings("unused")
     public boolean hasBeenClaimed() {
         return hasBeenClaimed;
     }
@@ -205,6 +233,19 @@ public class Device {
     public void setName(String name) {
         this.name = name;
         dbDevice.set(DEVICE_NAME, name);
+    }
+
+    /**
+     * Sets, updates, or removes the location
+     * of a device
+     */
+    public void setLocation(String location) {
+        if (description == null || description.equals("")) {
+            removeLocation();
+            return;
+        }
+        this.location = location;
+        dbDevice.set(DEVICE_LOCATION, location);
     }
 
     /**
@@ -242,10 +283,15 @@ public class Device {
      * Sets a device's status as claimed,
      * expects that it has been assigned to student
      */
+    @SuppressWarnings("unused")
     public void setClaimed() {
         setClaimed(true);
     }
 
+    /**
+     * Sets the device as either claimed or unclaimed
+     */
+    @SuppressWarnings("unused")
     private void setClaimed(boolean status) {
         if (assignedStudent == null)
             throw new IllegalArgumentException("Cannot (un)claim device that is not" +
@@ -269,11 +315,53 @@ public class Device {
     }
 
     /**
+     * Removes the location of a device
+     */
+    public void removeLocation() {
+        location = null;
+        dbDevice.remove(DEVICE_LOCATION);
+    }
+
+    /**
      * Deletes the description of a device
      */
     public void removeDescription() {
         description = null;
         dbDevice.remove(DEVICE_DESCRIPTION);
+    }
+
+    public void deleteDevice() {
+        dbDevice.delete();
+    }
+
+    /**
+     * Method that takes in a donor's object id and returns
+     * a list of all device ids donated by them
+     */
+    public static List<ObjectId> getDeviceIdsByDonor(ObjectId donorId) {
+        return DBDevice.getDevicesByUser(donorId, true);
+    }
+
+    public static List<String> getDevicesByDonor(ObjectId donorId) {
+        List<String> list = new ArrayList<>();
+        getDeviceIdsByDonor(donorId).stream().map(ObjectId::toString)
+                .forEach(list::add);
+        return list;
+    }
+
+    /**
+     * Method that takes in a student's object id and returns
+     * a list of all device ids offered to or accepted by them
+     */
+    public static List<ObjectId> getDeviceIdsByStudent(ObjectId studentId) {
+        return DBDevice.getDevicesByUser(studentId, false);
+    }
+
+    public static List<String> getDevicesByStudent(ObjectId studentId) {
+        List<String> list = new ArrayList<>();
+        getDeviceIdsByStudent(studentId).stream().map(ObjectId::toString)
+                .forEach(list::add);
+        return list;
     }
 
 }

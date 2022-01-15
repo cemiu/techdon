@@ -5,69 +5,67 @@ import org.bson.types.ObjectId;
 
 public interface DBInstance {
 
-    public DBWriteMode getWriteMode();
+    DBWriteMode getWriteMode();
 
-    public void setWriteMode(DBWriteMode newMode);
+    void setWriteMode(DBWriteMode newMode);
 
-    public void write();
+    void write();
 
-    public Object get(String key);
+    Object get(String key);
 
-    public default Object get(DBField field) {
+    default Object get(DBField field) {
         return get(field.getKey());
     }
 
     /**
      * Returns value of specified types
      */
-    public default <T> T get(String key, Class<T> t) {
+    default <T> T get(String key, Class<T> t) {
         Object obj = get(key);
-        if(obj == null || !t.isInstance(obj))
-            return null;
-        return t.cast(obj);
+        return t.isInstance(obj) ? t.cast(obj) : null;
     }
 
-    public default <T> T get(DBField field, Class<T> t) {
+    default <T> T get(DBField field, Class<T> t) {
         return get(field.getKey(), t);
     }
 
-    public default String getString(String key) {
+    default String getString(String key) {
         return get(key, String.class);
     }
 
-    public default String getString(DBField field) {
+    default String getString(DBField field) {
         return getString(field.getKey());
     }
 
-    public default Integer getInt(String key) {
+    default Integer getInt(String key) {
         return get(key, Integer.class);
     }
 
-    public default Integer getInt(DBField field) {
+    default Integer getInt(DBField field) {
         return getInt(field.getKey());
     }
 
-    public default Long getLong(String key) {
+    default Long getLong(String key) {
         return get(key, Long.class);
     }
 
-    public default Long getLong(DBField field) {
+    default Long getLong(DBField field) {
         return getLong(field.getKey());
     }
 
-    public default Boolean getBoolean(String key) {
+    default Boolean getBoolean(String key) {
         return get(key, Boolean.class);
     }
 
-    public default Boolean getBoolean(DBField field) {
+    default Boolean getBoolean(DBField field) {
         return getBoolean(field.getKey());
     }
 
-    public default ObjectId getObjectId(String key) {
+    default ObjectId getObjectId(String key) {
         return get(key, ObjectId.class);
     }
 
-    public default ObjectId getObjectId(DBField field) {
+    default ObjectId getObjectId(DBField field) {
         return getObjectId(field.getKey());
     }
 

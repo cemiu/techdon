@@ -1,7 +1,15 @@
+# This file is in the OpenAPI 3.0.1 format
+# and can be viewed in the Swagger Editor
+# under the URL: https://editor.swagger.io/
+
+# still missing some endpoints to resolve static data
+# (e.g. list of all device types supported on our platform)
+# also still missing the admin endpoints (verification, etc [?])
+
 openapi: 3.0.1
 info:
-  title: TechDonate
-  description: This is the REST API documentation for the end points for TechDonates
+  title: TechDon
+  description: This is the REST API documentation for the end points for TechDon
     platform will allow students to sign up, register for items and receive them in
     a simple, easy and straight forward procedure. The main aim of the platform is
     to provide students from a less privileged backgrounds to be able to apply for
@@ -19,35 +27,26 @@ info:
   contact:
     email: 2026156@Brunel.ac.uk
   license:
-    name: Thoybur Rohman
+    name: Thoybur Rohman / Philipp Bibik
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.0
+  version: 1.1.0
 servers:
 - url: https://Group50/v1
-- url: http://Group50/v1
 tags:
 - name: user
-  description: Operations about user . This end point will be all things the user
-    in genral will use to  communicate with Tech donates website , this includes registering
-    for an account , making changes to the profile , login , log out and delete .
-    further information can be found in the end point description
+  description: Endpoints related to general account management
   externalDocs:
-    description: all things to do with the user login or logout/ delete and register
-      to the platform
+    description: General account related queries like account creation, deletion, preferences, login, etc.
     url: http://localhost:8080/user
-- name: donate
-  description: This endpoint is focused on the donation side of the website , here
-    we can find the api for uplaoding , applying for a device. futhermore useres can
-    see what they have applied for or can as well as uplaoded
+- name: donor
+  description: Endpoints for users of the donor account type
   externalDocs:
-    description: TechDonate
-    url: http://localhost:8080/donate
+    description: TechDon
+    url: http://localhost:8080/donor
 - name: student
-  description: This endpoint pupose is to allow a student to apply / see available
-    ietms as well as claim any they have gotten . futher explination has been done
-    in each endpoint
+  description: Endpoints for users of the student account type
   externalDocs:
-    description: TechDonate api
+    description: TechDon
     url: http://localhost:8080/student
 paths:
   /user/register:
@@ -55,10 +54,7 @@ paths:
       tags:
       - user
       summary: Endpoint for creating new user
-      description: This rest api endpoint is used to create a new user for Yech donate.
-        The inputs taken in have been specified as well as examples given to show
-        case it . The user would enter these inputs and in retuen get a responce of
-        200 which would alos auto log them in alloing an authetication toke
+      description: This REST API endpoint is used to create a new user. All fields are mandatory. Returns an auth token and user type if the registration was successful, otherwise it returns 400 (missing fields / wrong formats / etc.)
       operationId: createUser
       parameters:
       - name: firstName
@@ -111,76 +107,120 @@ paths:
             type: string
       responses:
         200:
-          description: account creation successful
+          description: Successfully created the account
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/authenticationToken'
+        400:
+          description: Account creation failed
   /user/login:
     get:
       tags:
       - user
       summary: Endpoint for logging in
-      description: This is the login authetication for TechDonate . When the user
-        inputs the correct credentials they are given a token which will allow them
-        ti use the platform and stya logged in , this api takes input of string and
-        gives a token as reponce
+      description: This is the endpoint for logging in as a user. Required are an email and a password. If they match up with an entry in the database, a new auth token is generated and returned to the user, along with the user type. Otherwise 400 is returned.
       operationId: loginUser
       parameters:
       - name: email
         in: query
-        description: The email for login
+        description: Email for login
         required: true
         schema:
           type: string
       - name: password
         in: query
-        description: The password for login in clear text
+        description: Clear-text password
         required: true
         schema:
           type: string
       responses:
         200:
-          description: successful logged in
+          description: Successfully logged in
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/authenticationToken'
         400:
-          description: Invalid username/password supplied
-          content: {}
+          description: Invalid parameters
+        401:
+          description: Invalid username/password combination
   /user/logout:
-    get:
+    post:
       tags:
       - user
       summary: Endpoint for terminating user session / logging out
-      description: checks token to autheticate it
+      description: Marks an authToken supplied by a user as invalid for future sessions, thus logging the user out of their session.
       operationId: logoutUser
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
-        description: Authentication token to prove identity
+        description: Auth token to prove identity
         required: true
         schema:
           type: string
       responses:
         200:
-          description: successful operation
-          content: {}
+          description: Successfully logged out
         400:
-          description: could not authenticate
-          content: {}
-  /user/update:
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
+  /user/account/verifyEmail:
+    post:
+      tags:
+      - user
+      summary: Endpoint for verifying email
+      description: This end point will be used to verify the email for a user
+      operationId: Verify
+      parameters:
+      - name: emailAuthToken
+        in: query
+        description: The unique authentication token sent to user's email
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: Successfully verified email
+        400:
+          description: Invalid parameters
+        401:
+          description: Unknown token
+  /user/account/settings/get:
     get:
       tags:
       - user
+      summary: Returns the preferences of an account
+      description: This endpoint takes in an auth token and returns all user preferences which can be changed.
+      operationId: settings
+      parameters:
+      - name: authToken
+        in: query
+        description: Auth token for authentication
+        required: true
+        schema:
+          type: string
+      responses:
+        200:
+          description: successfully loaded settings
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TechDonUser'
+        400:
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
+  /user/account/settings/update:
+    post:
+      tags:
+      - user
       summary: Updating specified fields related to users
-      description: This rest end point will be used to allow  a user to update there
-        profile. the same api can be used to also delete a persons account the responce
-        for this can be found at the bottom
+      description: Endpoint to update the account preferences of a user. Expected are a valid auth token and any number of user fields which are to be updated. Only the fields which are given as input are updated in the database. Returns the new user preferences if the operation was successful, otherwise 400.
       operationId: getUserByName
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
         description: Authentication token to prove identity
         required: true
@@ -224,173 +264,54 @@ paths:
             type: string
       responses:
         200:
-          description: successfully updated account
+          description: Successfully updated account (returns new account state excluding the password)
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TechDonateUser'
+                $ref: '#/components/schemas/TechDonUser'
         400:
-          description: Invalid username supplied
-          content: {}
-        404:
-          description: User not found
-          content: {}
-  /user/account/verifyEmail:
-    get:
-      tags:
-      - user
-      summary: Endpoint for verifying email
-      description: This end point will be used to verify the email for a user
-      operationId: Verify
-      parameters:
-      - name: email
-        in: query
-        description: The email for login
-        required: true
-        schema:
-          type: string
-      responses:
-        200:
-          description: successful logged in
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/authenticationTokenEmail'
-        400:
-          description: Invalid username/password supplied
-          content: {}
-  /user/account/settings/get:
-    get:
-      tags:
-      - user
-      summary: API to get settings for techDonate
-      description: This is the rest api to get the settings for the rest api for TechDonate
-        , there the user would input there settings
-      operationId: settings
-      parameters:
-      - name: auth_token
-        in: query
-        description: Auth token for authentication
-        required: true
-        schema:
-          type: string
-      responses:
-        200:
-          description: successfully loaded settings
-          content: {}
-        400:
-          description: Invalid username supplied
-          content: {}
-        404:
-          description: User not found
-          content: {}
-  /user/account/settings/update:
-    post:
-      tags:
-      - user
-      summary: Endpoint Updating user setting
-      description: ' This is the EndPoint for updating the user settings update'
-      operationId: update User
-      parameters:
-      - name: firstName
-        in: query
-        description: First Name
-        required: true
-        schema:
-          type: string
-      - name: lastName
-        in: query
-        description: Last Name
-        required: true
-        schema:
-          type: string
-      - name: email
-        in: query
-        description: Email Address
-        required: true
-        schema:
-          type: string
-      - name: password
-        in: query
-        description: Clear text password
-        required: true
-        schema:
-          type: string
-      - name: phone
-        in: query
-        description: Phone number
-        required: true
-        schema:
-          type: string
-      - name: userType
-        in: query
-        description: User type (student / donor)
-        required: true
-        schema:
-          type: string
-      - name: address
-        in: query
-        description: User address, as string array containing 3-5 values
-        required: true
-        style: form
-        explode: false
-        schema:
-          maxItems: 5
-          minItems: 3
-          type: array
-          items:
-            type: string
-      responses:
-        200:
-          description: Account updated
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TechDonateUser'
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
   /user/delete:
     delete:
       tags:
       - user
-      summary: Delete user
-      description: This can only be done by the logged in user.
+      summary: Delete an account
+      description: This endpoint deletes an account and all associated data. Expects a valid auth token and returns 200 if the deletion was successful, 401 otherwise.
       operationId: deleteUser
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
-        description: Authentication token to prove identity
+        description: Auth token to prove identity
         required: true
         schema:
           type: string
-      - name: password
-        in: query
-        description: The password it required to assue that account deletion cannot
-          happen on accident
-        required: true
-        schema:
-          type: string
+      #- name: password
+      #  in: query
+      #  description: The password it required to assue that account deletion cannot
+      #    happen on accident
+      #  required: true
+      #  schema:
+      #    type: string
       responses:
         200:
-          description: successfully deleted account
-          content: {}
+          description: Successfully deleted the account
         400:
-          description: Cannot find user
-          content: {}
+          description: Invalid parameters
         401:
-          description: Wrong password
-          content: {}
-  /donate/device/new:
+          description: Could not authenticate
+  /donor/device/new:
     post:
       tags:
-      - donate
+      - donor
       summary: List a new device for donation
-      description: using this end point a person will be able to upload a new item
-        and specify in the feaild and give it description . This is a post method
-        which takes in input of string
+      description: Endpoint for listing a new device for donation on the platform. Requires an authToken of a donor account and the required fields to by supplied. Device description and photos are optional.
       operationId: UploadItem
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
-        description: Authentication token to prove identity
+        description: Auth token to prove identity
         required: true
         schema:
           type: string
@@ -419,21 +340,21 @@ paths:
           type: string
       responses:
         200:
-          description: successful uploaded device
-          content: {}
+          description: Device uploaded successfully
         400:
-          description: invalid uplaod
-          content: {}
-  /donate/device/listedDevices:
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
+  /donor/device/listedDevices:
     get:
       tags:
-      - donate
+      - donor
       summary: Get list of donated devices
-      description: This endpoint returns a list of all devices listed by them as a
-        String Array ["106073", "460315", etc.]
+      description: This endpoint returns a list of all devices listed by a donor as a
+        String Array ["0b52b9a5-0737-4762-b628-b55eb988744c", "6920289b-d447-4fdb-b178-03e4562a9839", "3127fec8-5bc3-4ac8-b831-697e831581dc", ...]
       operationId: getDevices
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
         description: Auth token for authentication
         required: true
@@ -447,24 +368,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/device'
         400:
-          description: Invalid authentication
-          content: {}
-  /donate/device/load:
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
+  /donor/device/load:
     get:
       tags:
-      - donate
-      summary: Load information about donated device
-      description: Endpoint to load detailed information about a device which has
-        been donated by them
+      - donor
+      summary: Load information about a donated device
+      description: Endpoint for donors to load information about a device which has been donated by them. Expects an auth token and device id
       operationId: loadDevices
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
         description: Auth token for authentication
         required: true
         schema:
           type: string
-      - name: deviceID
+      - name: deviceId
         in: query
         description: ID of device to be loaded
         required: true
@@ -472,66 +393,75 @@ paths:
           type: string
       responses:
         200:
-          description: successfuly selected
+          description: Device data
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/getDevice'
         400:
-          description: invalid selection
-          content: {}
-  /donate/device/remove:
-    get:
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
+  /donor/device/remove:
+    delete:
       tags:
-      - donate
-      summary: Get list of donated devices
-      description: This endpoint returns a list of all devices listed by them as a
-        String Array ["106073", "460315", etc.]
-      operationId: Device Remove
+      - donor
+      summary: Remove donated device
+      description: This endpoint is for donor to remove devices they have listed from the platform. 
+      operationId: DeviceRemove
       parameters:
-      - name: Device number
+      - name: authToken
         in: query
-        description: User enters device number which is to be removed
+        description: Auth token for authentication
+        required: true
+        schema:
+          type: string
+      - name: deviceId
+        in: query
+        description: ID of device to be removed
         required: true
         schema:
           type: string
       responses:
         200:
           description: Device succfully removed
-          content: {}
         400:
-          description: Device Not found please try again
-          content: {}
-  /donate/device/update:
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
+  /donor/device/update:
     post:
       tags:
-      - donate
-      summary: 'Device update '
-      description: This is the rest api for the device update
+      - donor
+      summary: Update device info
+      description: Endpoint for updating the information of a device. Requires the authToken and deviceId to specify which device is to be updated and prove authorization, along with any number of device fields and the new values they should be set to. Unspecified values are not to be changed. Returns the new device state.
       operationId: Update
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
-        description: Authentication token to prove identity
+        description: Auth token for authentication
+        required: true
+        schema:
+          type: string
+      - name: deviceId
+        in: query
+        description: ID of device to be removed
         required: true
         schema:
           type: string
       - name: productType
         in: query
         description: Type of donated product (laptop / monitor / etc.)
-        required: true
         schema:
           type: string
       - name: productName
         in: query
         description: Name of the product
-        required: true
         schema:
           type: string
       - name: productLocation
         in: query
         description: Location of product (City or Postcode)
-        required: true
         schema:
           type: string
       - name: productDescription
@@ -541,51 +471,57 @@ paths:
           type: string
       responses:
         200:
-          description: successful updated device
-          content: {}
+          description: Device updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getDevice'
         400:
-          description: invalid selection please try again
-          content: {}
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
   /student/devices/setPreferences:
     post:
       tags:
       - student
-      summary: This allows user to set the device prefernce
-      description: Using This Rest API a user can set the device prefernce
+      summary: Set student device preferences
+      description: This endpoint is used by students to select which kinds of device they and interested in, and thus would want to be considered for.
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
         description: Auth token for authentication
         required: true
         schema:
           type: string
-      - name: deviceType
+      - name: deviceTypes
         in: query
-        description: First Name
+        description: Strings array containing enumeration of devices
         required: true
         schema:
-          type: string
-      - name: deviceLocation
+          type: array
+          items:
+            type: string
+      - name: userLocation
         in: query
-        description: Locatin of the area
+        description: Location of the user, to base in-person collection selection on
         required: true
         schema:
           type: string
       responses:
         200:
-          description: successful set Preferences
-          content: {}
+          description: Successfully set preferences
         400:
-          description: invalid input
-          content: {}
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
   /student/devices/loadPreferences:
     get:
       tags:
       - student
-      summary: This allows user to load there device prefernce
-      description: Using This Rest API a user can load the device prefernce
+      summary: This allows students to load their device preferences
+      description: This endpoint is used to load the device preferences specified by a user. Returns an enumeration of device types selected by the student in form of a string array along with the location the student set.
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
         description: Auth token for authentication
         required: true
@@ -599,16 +535,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/device'
         400:
-          description: invalid selection
-          content: {}
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
   /student/devices/offeredDevices:
     get:
       tags:
       - student
-      summary: Returnes array containing IDs of devices ready to be claimed by user
-      description: here a user can load all the avaialbel anf offer devices to them
+      summary: Returns array containing IDs of devices ready to be claimed by student
+      description: Returns a list of devices available to be claimed by a student in form of a string array
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
         description: Auth token for authentication
         required: true
@@ -616,23 +553,24 @@ paths:
           type: string
       responses:
         200:
-          description: successful operation
+          description: Device list
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/device'
         400:
-          description: invalid selection
-          content: {}
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
   /student/devices/load:
     get:
       tags:
       - student
-      summary: Returns device details of device offered / claimed by student
-      description: loads information about device offered to user [same as donate/device/load,
-        just for students
+      summary: Returns the device details of a device either offered or claimed by a student
+      description: Loads information about a device offered to a user [same as donor/device/load,
+        just for students]
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
         description: Auth token for authentication
         required: true
@@ -646,25 +584,23 @@ paths:
           type: string
       responses:
         200:
-          description: successfullty loaded
+          description: Device data
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/getDevice'
         400:
-          description: invalid selection
-          content: {}
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
   /student/devices/claim:
     get:
       tags:
       - student
-      summary: Endpoint for studetns to claim device
-      description: After the user has been given an email confirmation of the validation
-        of there item they can proceed to claim it. This input is a get input and
-        does not take any input in except the login token the responce is string and
-        an example is givn.
+      summary: Endpoint for students to claim device
+      description: This endpoint is used by students to claim a device that has been offered to them. If claim is successful, the point returns contact information of the donor. The student and donor are also sent this information in email form.
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
         description: Auth token for authentication
         required: true
@@ -672,7 +608,7 @@ paths:
           type: string
       - name: deviceID
         in: query
-        description: ID of device to be loaded
+        description: ID of device to be claimed
         required: true
         schema:
           type: string
@@ -684,19 +620,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/claim'
         400:
-          description: invalid selection
-          content: {}
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
   /student/devices/decline:
-    get:
+    post:
       tags:
       - student
-      summary: Endpoint for studetns to claim device
-      description: After the user has been given an email confirmation of the validation
-        of there item they can proceed to claim it. This input is a get input and
-        does not take any input in except the login token the responce is string and
-        an example is givn.
+      summary: Endpoint for students to devlice a device
+      description: This endpoint is used by students to decline a device that has been offered to them. 
       parameters:
-      - name: auth_token
+      - name: authToken
         in: query
         description: Auth token for authentication
         required: true
@@ -704,34 +638,31 @@ paths:
           type: string
       - name: deviceID
         in: query
-        description: ID of device to be loaded
+        description: ID of device to be declined
         required: true
         schema:
           type: string
       responses:
         200:
-          description: successfully declined
-          content: {}
+          description: Successfully declined
         400:
-          description: invalid selection
-          content: {}
+          description: Invalid parameters
+        401:
+          description: Could not authenticate
 components:
   schemas:
-    TechDonateUser:
+    TechDonUser:
       type: object
       properties:
         firstName:
           type: string
-          example: alex
+          example: Alex
         lastName:
           type: string
-          example: ben
+          example: Smith
         email:
           type: string
           example: 2026156@brunel.ac.uk
-        password:
-          type: string
-          example: password
         phone:
           type: string
           example: "07547878777"
@@ -741,26 +672,23 @@ components:
           format: int32
         address:
           type: array
-          description: 'Address feilds '
+          description: 'Address feilds'
           example:
-          - 'Flat2 '
+          - Flat2
           - Wensley Street
           - Uxbridge
           - UB1 5DF
           items:
             type: string
-    authenticationTokenEmail:
-      type: object
-      properties:
-        Email_auth_token:
-          type: string
-          example: seEWMrPzE7Ee7fUUas8pw4Vks3mnLZNGFhzevLMETTXn3
     authenticationToken:
       type: object
       properties:
-        auth_token:
+        authToken:
           type: string
           example: seEWMrPzE7Ee7fUUas8pw4Vks3mnLZNGFhzevLMETTXn3
+        userType:
+          type: string
+          example: student / donor
     getDevice:
       type: object
       properties:
@@ -782,13 +710,13 @@ components:
       properties:
         ItemNumber:
           type: string
-          format: 'String or Number '
+          format: 'String or Number'
           example: HP laptop
         address:
           type: array
           description: Address feilds
           example:
-          - 'Flat2 '
+          - Flat2
           - Wensley Street
           - Uxbridge
           - UB1 5DF
@@ -802,10 +730,10 @@ components:
           example: +4414060391
     device:
       type: array
-      description: ' List of device IDs'
+      description: 'List of device IDs'
       example:
-      - "160603"
-      - "306073"
-      - "440731"
+      - "0b52b9a5-0737-4762-b628-b55eb988744c"
+      - "6920289b-d447-4fdb-b178-03e4562a9839"
+      - "3127fec8-5bc3-4ac8-b831-697e831581dc"
       items:
         type: string

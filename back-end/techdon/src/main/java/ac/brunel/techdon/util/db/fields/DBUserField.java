@@ -1,7 +1,5 @@
 package ac.brunel.techdon.util.db.fields;
 
-import java.util.List;
-
 public enum DBUserField implements DBField {
 
     ID("_id"), // objectId, auto-generated
@@ -19,7 +17,7 @@ public enum DBUserField implements DBField {
     PHONE("phone"), // string
     ADDRESS("address"); // List<String>
 
-    private String key;
+    private final String key;
 
     DBUserField(String key) {
         this.key = key;
