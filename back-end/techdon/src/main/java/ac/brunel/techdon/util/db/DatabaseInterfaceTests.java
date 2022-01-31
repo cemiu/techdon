@@ -23,7 +23,8 @@ import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
 public class DatabaseInterfaceTests {
 
     public static void main(String[] args) {
-        addDevice();
+        createDummyStudent();
+    	//addDevice();
         //modifyDevice();
     }
 
@@ -110,14 +111,14 @@ public class DatabaseInterfaceTests {
 
         student.set(UNIVERSITY, "Brunel University");
         student.set(COUNTRY, "United Kingdom");
-        student.set(DEVICE_SELECTION, Arrays.asList(
+        /*student.set(DEVICE_SELECTION, Arrays.asList(
                 new Document("type", DeviceType.LAPTOP)
                         .append("date_selected", Instant.now().getEpochSecond()),
                 new Document("type", DeviceType.HARD_DRIVE)
                         .append("date_selected", Instant.now().getEpochSecond()),
                 new Document("type", DeviceType.MONITOR)
                         .append("date_selected", Instant.now().getEpochSecond())
-        ));
+        ));*/
         student.write();
     }
 

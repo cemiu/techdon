@@ -329,7 +329,10 @@ public class Device {
         description = null;
         dbDevice.remove(DEVICE_DESCRIPTION);
     }
-
+    
+    /**
+     * Deletes device from db
+     */
     public void deleteDevice() {
         dbDevice.delete();
     }
@@ -341,7 +344,11 @@ public class Device {
     public static List<ObjectId> getDeviceIdsByDonor(ObjectId donorId) {
         return DBDevice.getDevicesByUser(donorId, true);
     }
-
+    
+    /**
+     * Returns a list of all devices
+     * belonging to a donor
+     */
     public static List<String> getDevicesByDonor(ObjectId donorId) {
         List<String> list = new ArrayList<>();
         getDeviceIdsByDonor(donorId).stream().map(ObjectId::toString)
@@ -357,6 +364,11 @@ public class Device {
         return DBDevice.getDevicesByUser(studentId, false);
     }
 
+    /**
+     * 
+     * 
+     * 
+     */
     public static List<String> getDevicesByStudent(ObjectId studentId) {
         List<String> list = new ArrayList<>();
         getDeviceIdsByStudent(studentId).stream().map(ObjectId::toString)

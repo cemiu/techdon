@@ -1,5 +1,8 @@
 package ac.brunel.techdon.user;
 
+import static ac.brunel.techdon.util.db.fields.DBUserField.*;
+import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
+
 import org.bson.types.ObjectId;
 
 import ac.brunel.techdon.util.db.DBStudent;
@@ -15,14 +18,13 @@ public class Student {
 	private String email;
 	private String phone;
 	private String gender;
-	private String university;
-	private String country;
 	private String address;
 	private String postCode;
 	
-	@SuppressWarnings("unused")
-    private Student() {}
-	
+	/**
+     * Creates a new student entity, that can
+     * be added to the database
+     */
 	public Student(ObjectId student, String firstName, 
 			String lastName, int age, String email, String phone, String gender, 
 			String university, String country, String address, String postCode) {
@@ -32,13 +34,14 @@ public class Student {
 		this.age = age;
 		this.email = email;
 		this.gender = gender;
-		this.university = university;
-		this.country = country;
 		this.address = address;
 		this.postCode = postCode;
+		
 				
 		// TODO: write to db
 		dbStudent = new DBStudent();
+		dbStudent.set(UNIVERSITY, university);
+		dbStudent.set(COUNTRY, country);
 	}
 	
 	// TODO: fix getters and setters & add methods
@@ -108,19 +111,19 @@ public class Student {
 	}
 
 	public String getUniversity() {
-		return university;
+		return dbStudent.getString(UNIVERSITY);
 	}
 
 	public void setUniversity(String university) {
-		this.university = university;
+		dbStudent.set(UNIVERSITY, university);
 	}
 
 	public String getCountry() {
-		return country;
+		return dbStudent.getString(COUNTRY);
 	}
 
 	public void setCountry(String country) {
-		this.country = country;
+		dbStudent.set(COUNTRY, country);
 	}
 
 	public String getAddress() {
