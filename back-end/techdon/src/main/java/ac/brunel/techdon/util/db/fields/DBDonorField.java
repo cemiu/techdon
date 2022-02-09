@@ -6,8 +6,8 @@ package ac.brunel.techdon.util.db.fields;
  */
 public enum DBDonorField implements DBField {
 
-    DONATED_DEVICES("donated_devices"); // array of type Device
-
+	TEMP(null);
+	
     private final String key;
 
     DBDonorField(String key) {

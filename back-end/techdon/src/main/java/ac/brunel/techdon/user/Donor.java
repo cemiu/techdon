@@ -3,31 +3,43 @@ import ac.brunel.techdon.device.*;
 
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 
 import static ac.brunel.techdon.util.db.fields.DBDonorField.*;
 import ac.brunel.techdon.util.db.DBDonor;
+import ac.brunel.techdon.util.db.DBUser;
 
 public class Donor extends User {
 	
 	DBDonor dbDonor;
-	private ObjectId donorId;	
-	private List<Device> donatedDevices;
+	private List<ObjectId> donatedDevices;
 	
 	/**
      * Creates a new donor entity, that can
      * be added to the database
      */
-	public Donor(ObjectId donorId, String firstName, String lastName, int age, String email,
-			String phone, String gender, String address, String postCode) {
-		super(firstName, lastName, age, email, phone, gender, address, postCode);
-		this.donorId = donorId;
+	public Donor(ObjectId donorId, String firstName, String lastName, String email,
+			String password, String phone, List<String> address) {
+		super(firstName, lastName, email, password, phone, address);
 		
 		// write to db
 		dbDonor = new DBDonor();
-		dbDonor.set(DONATED_DEVICES, donatedDevices);
+		super.init(dbDonor);
+		donatedDevices = new ArrayList<>();
+		
+		
+	}
+	
+	public Donor(String auth) {
+		super();
+		dbDonor = new DBDonor(DBUser.Id.AUTH_TOKEN, auth);
+		super.load(dbDonor);
+		
+		// load donor specific from database
+		donatedDevices = Device.getDeviceIdsByDonor(userId);
 	}
 
 	// TODO: fix getters and setters and add methods
@@ -40,21 +52,7 @@ public class Donor extends User {
 		this.dbDonor = dbDonor;
 	}
 
-	public ObjectId getDonorId() {
-		return donorId;
-	}
-
-	public void setDonorId(ObjectId donorId) {
-		this.donorId = donorId;
-	}
-
 	public List<ObjectId> getDonatedDevices() {
 		return dbDonor.getDeviceList();
 	}
-
-	public void setDonatedDevices(List<Device> donatedDevices) {
-		dbDonor.set(DONATED_DEVICES, donatedDevices);
-	}
-	
-	
 }

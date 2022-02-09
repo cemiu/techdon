@@ -1,35 +1,78 @@
 package ac.brunel.techdon.user;
 
+import static ac.brunel.techdon.util.db.fields.DBUserField.*;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
 import org.bson.types.ObjectId;
 
+import ac.brunel.techdon.util.HashingHelper;
+import ac.brunel.techdon.util.db.DBUser;
+
 public class User {
-	private String firstName;
-	private String lastName;
-	private int age;
-	private String email;
-	private String phone;
-	private String gender;
-	private String address;
-	private String postCode;
-	private boolean loggedIn;
+	private DBUser dbUser;
+	
+	protected ObjectId userId;
+	protected String firstName;
+	protected String lastName;
+	protected String email;
+	protected String passwordSalt;
+	protected String passwordHash;
+	protected String phone;
+	protected List<String> address;
+	protected long creationDate;
+	protected List<String> authTokens;
+	
+	protected User() {}
 	
 	/**
 	 * Constructor for superclass User,
 	 * used in the Student and Donor subclasses
 	 */
-	public User(String firstName, String lastName, int age, 
-			String email, String phone, String gender, 
-			String address, String postCode) {
+	public User(String firstName, String lastName,
+			String email, String password,
+			String phone, 
+			List<String> address) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.age = age;
 		this.email = email;
+		this.passwordSalt = UUID.randomUUID().toString();
+		this.passwordHash = HashingHelper.getHash(password, passwordSalt);
 		this.phone = phone;
-		this.gender = gender;
 		this.address = address;
-		this.postCode = postCode;
-		this.loggedIn = false;
+		this.creationDate = Instant.now().getEpochSecond();
+		this.authTokens = new ArrayList<>();
 	}
+	
+	protected void init(DBUser dbUser) {
+		this.dbUser = dbUser;
+		
+		userId = (ObjectId) dbUser.get(ID);
+		// TODO: write to db
+		dbUser.set(EMAIL, email);
+		dbUser.set(PASSWORD_HASH, passwordHash);
+		dbUser.set(PASSWORD_SALT, passwordSalt);
+		dbUser.set(CREATION_DATE, creationDate);
+		dbUser.set(AUTH_TOKENS, authTokens);
+		dbUser.set(FIRST_NAME, firstName);
+		dbUser.set(LAST_NAME, lastName);
+		dbUser.set(PHONE, phone);
+		dbUser.set(ADDRESS, address);
+	}
+	
+	protected void load(DBUser dbUser) {
+		this.dbUser = dbUser;
+		
+		// load from database
+		firstName = dbUser.getString(FIRST_NAME);
+		// TODO: all other fields
+	}
+	
+	// TODO: write methods for loggin in, logging out, deleting accounts
+	// TODO: fix getters and setters to update account and change in db
 
 	public String getFirstName() {
 		return firstName;
@@ -45,14 +88,6 @@ public class User {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
-	}
-
-	public int getAge() {
-		return age;
-	}
-
-	public void setAge(int age) {
-		this.age = age;
 	}
 
 	public String getEmail() {
@@ -71,35 +106,11 @@ public class User {
 		this.phone = phone;
 	}
 
-	public String getGender() {
-		return gender;
-	}
-
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
-
-	public String getAddress() {
+	public List<String> getAddress() {
 		return address;
 	}
 
-	public void setAddress(String address) {
+	public void setAddress(List<String> address) {
 		this.address = address;
-	}
-
-	public String getPostCode() {
-		return postCode;
-	}
-
-	public void setPostCode(String postCode) {
-		this.postCode = postCode;
-	}
-
-	public boolean isLoggedIn() {
-		return loggedIn;
-	}
-
-	public void setLoggedIn(boolean loggedIn) {
-		this.loggedIn = loggedIn;
 	}
 }

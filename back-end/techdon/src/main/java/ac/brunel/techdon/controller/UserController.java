@@ -1,5 +1,6 @@
 package ac.brunel.techdon.controller;
 
+import org.bson.Document;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -10,24 +11,17 @@ import ac.brunel.techdon.user.User;
 @RestController
 public class UserController {
 	
-	// TODO: implement the registration endpoint so that it registers
-	// as User not separately for students and donors
-	
 	/**
 	 * endpoint to register a student account
 	 */
 	@GetMapping("/api/user/register")
-	public Student studentRegister() {
-		return new Student(null, null, null, 0, null, null, null, 
-				null, null, null, null);
-	}
-	
-	/**
-	 * endpoint to register a donor account
-	 */
-	@GetMapping("/api/user/register")
-	public Donor donorRegister() {
-		return new Donor(null, null, null, 0, null, null, null, null, null);
+	public String studentRegister() {
+		
+		// TODO: finish up
+		
+		Document response = new Document("authToken", "dsgsggsgrsg")
+				.append("userType", "student");
+		return response.toJson();
 	}
 	
 	/**
@@ -35,7 +29,7 @@ public class UserController {
 	 */
 	@GetMapping("/api/user/login")
 	public void logIn(User user) {
-		user.setLoggedIn(true);
+		
 	}
 	
 	/**
@@ -43,6 +37,6 @@ public class UserController {
 	 */
 	@GetMapping("/api/user/logout")
 	public void logOut(User user) {
-		user.setLoggedIn(false);
+		
 	}
 }
