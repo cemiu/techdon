@@ -7,9 +7,7 @@ package ac.brunel.techdon.util.db.fields;
 public enum DBStudentField implements DBField {
 
     UNIVERSITY("university"), // string
-    COUNTRY("country"), // string, required (?)
-    DEVICE_SELECTION("deviceSelection"), // array<object> TODO add interface support for
-    DEVICES_OFFERED("devicesOffered"); // array<string> (or custom type?)
+    COUNTRY("country"); // string, required (?)
 
     private final String key;
 

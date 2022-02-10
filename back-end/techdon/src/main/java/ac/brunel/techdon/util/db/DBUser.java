@@ -51,23 +51,10 @@ public abstract class DBUser implements DBInstance {
      * Use {@link #set(DBUserField, Object)} for external, safe use
      */
     protected void set(String field, Object value) {
-        String[] path = field.split("/");
-
-        if (path.length == 1)
-            doc.put(field, value);
-        else if (path.length == 2) {
-            Document subDoc = (Document) doc.get(path[0]);
-            if (subDoc == null)
-                subDoc = new Document();
-            subDoc.put(path[1], value);
-        } else
-            throw new IllegalArgumentException("Path " + field + " contains two sub-objects." +
-                    "Try limiting yourself to one object; if you can't, talk to Philipp to expand functionality.");
+        doc.put(field, value);
 
         if (writeMode == DBWriteMode.AUTOMATIC)
-            write(); // TODO write the entire document, or just write differences since last write
-                    // maybe keep track of changes in a separate document and flush after every write
-                    // or construct bson update command as you go
+            write();
     }
 
     /**
