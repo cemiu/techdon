@@ -28,7 +28,16 @@ public class DevicePreference {
 
     private DevicePreference() {}
 
-    public DevicePreference(ObjectId studentId, DeviceType deviceType) {
+    /**
+     * Loads
+     */
+    public DevicePreference(ObjectId studentId, DeviceType deviceType, boolean createIfNotExists) {
+        // 1: attempt to load
+
+        if (!createIfNotExists)
+            return;
+        // 2: if not found, create
+        dbPref = new DBDevicePref();
         this.studentId = studentId;
         this.deviceType = deviceType;
         this.selectionDate = Instant.now().getEpochSecond();
@@ -45,6 +54,32 @@ public class DevicePreference {
     }
 
     /**
+     * Sets whether the preference is in the queue
+     * for the device assignment (if a device is offered,
+     * it is removed from the queue).
+     */
+    public void setPrefIsInQueue(boolean isPrefInQueue) {
+        this.isPrefInQueue = isPrefInQueue;
+        dbPref.set(PREF_IS_IN_QUEUE, isPrefInQueue);
+    }
+
+    /**
+     * Resets the selection date to the current time.
+     * (Moves student to the end of the queue.)
+     */
+    public void resetSelectionDate() {
+        selectionDate = Instant.now().getEpochSecond();
+        dbPref.set(PREF_DATE, selectionDate);
+    }
+
+    /**
+     * Deletes the preference
+     */
+    public void removePreference() {
+        dbPref.delete();
+    }
+
+    /**
      * Returns the preference with the associated student
      * that is next in queue to receive a device.
      */
@@ -57,9 +92,8 @@ public class DevicePreference {
      * Returns the preferences of a particular student,
      * as a list of device types preferred by them.
      */
-    public static List<String> getPreferedDevicesByStudent(ObjectId studentId) {
+    public static List<String> getPreferredDevicesByStudent(ObjectId studentId) {
         // TODO
-        DBDevicePref.get
         return null;
     }
 

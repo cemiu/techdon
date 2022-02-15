@@ -1,5 +1,6 @@
 package ac.brunel.techdon.util.db;
 
+import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.db.fields.DBDeviceField;
 import ac.brunel.techdon.util.db.fields.DBDevicePrefField;
 import ac.brunel.techdon.util.db.support.DBInstance;
@@ -39,6 +40,15 @@ public class DBDevicePref implements DBInstance {
         this.doc = db.getDocumentByField("_id", prefId);
         if (this.doc == null)
             existsInDB = false;
+    }
+
+    /**
+     * Loads a preference by student id and device type.
+     * Call {@link #doesExistInDB()} after loading to make
+     * sure that the device loaded correctly
+     */
+    public DBDevicePref(ObjectId studentId, DeviceType deviceType) {
+        this.doc = db.getDocumentByField((String) null, (String) null); // TODO !!!!!!!!!!!!!
     }
 
     /**

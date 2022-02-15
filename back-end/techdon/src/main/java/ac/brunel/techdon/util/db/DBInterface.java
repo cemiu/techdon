@@ -9,7 +9,10 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
+
+import java.util.Map;
 
 public class DBInterface {
 
@@ -43,6 +46,24 @@ public class DBInterface {
             throw new IllegalArgumentException("Cannot lookup DB Document in " +
                     collectionName + " with value " + id + " in field " + field);
         return collection.find(eq(field, id)).first();
+    }
+
+    /**
+     * Uses a map of fields and their values to find a unique document
+     */
+    public Document getDocumentByFields(Map<String, Object> fields) {
+        if (fields == null || fields.isEmpty() || fields.containsValue(null)
+                || fields.containsValue(""))
+            throw new IllegalArgumentException("Cannot lookup DB Document in "
+                    + collectionName + " with fields " + fields);
+        // constructs a filter that concatenates all the fields
+        Bson[] eqs = new Bson[fields.size()];
+        int i = 0;
+        for (Map.Entry<String, Object> entry : fields.entrySet()) {
+            eqs[i] = eq(entry.getKey(), entry.getValue());
+            i++;
+        }
+        return collection.find(and(eqs)).first();
     }
 
     private FindIterable<Document> getDocumentsByField(String field, ObjectId id) {
