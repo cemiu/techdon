@@ -1,48 +1,48 @@
 package ac.brunel.techdon.util.db;
 
 import ac.brunel.techdon.util.db.fields.DBDeviceField;
-import ac.brunel.techdon.util.db.fields.DBField;
+import ac.brunel.techdon.util.db.fields.DBDevicePrefField;
 import ac.brunel.techdon.util.db.support.DBInstance;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
-import com.mongodb.client.FindIterable;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
-import java.util.List;
+import static ac.brunel.techdon.util.db.fields.DBDevicePrefField.*;
 
-import static ac.brunel.techdon.util.db.fields.DBDeviceField.*;
+public class DBDevicePref implements DBInstance {
 
-public class DBDevice  implements DBInstance {
-
-    private static final DBInterface db = new DBInterface("devices");
+    private static final DBInterface db = new DBInterface("device_preferences");
 
     private DBWriteMode writeMode = DBWriteMode.MANUAL;
     public Document doc;
     private boolean existsInDB = true;
 
-    public DBDevice() {
+    /**
+     * Creates a new empty {@link DBDevicePref} object
+     * for manual initialization
+     */
+    public DBDevicePref() {
         existsInDB = false;
         doc = new Document();
         doc.put("_id", new ObjectId());
     }
 
-    public DBDevice(String deviceId) {
-        this(new ObjectId(deviceId));
+    public DBDevicePref(String prefId) {
+        this(new ObjectId(prefId));
     }
 
     /**
-     * Loads a device from the database. Call {@link #doesExistInDB()}
+     * Loads a preference from the database. Call {@link #doesExistInDB()}
      * after loading to make sure that the device loaded correctly
      */
-    public DBDevice(ObjectId deviceId) {
-        this.doc = db.getDocumentByField("_id", deviceId);
+    public DBDevicePref(ObjectId prefId) {
+        this.doc = db.getDocumentByField("_id", prefId);
         if (this.doc == null)
             existsInDB = false;
     }
 
     /**
-     * Resolves an object, given a field
+     * Returns a value of the db object, given a field
      */
     public Object get(String key) {
         return doc.get(key);
@@ -50,7 +50,7 @@ public class DBDevice  implements DBInstance {
 
     /**
      * Sets a field in the database, for internal use only
-     * Use {@link #set(DBDeviceField, Object)} for external, safe use
+     * Use {@link #set(DBDevicePrefField, Object)} for external, safe use
      */
     private void set(String field, Object value) {
         doc.put(field, value);
@@ -62,10 +62,10 @@ public class DBDevice  implements DBInstance {
     /**
      * Sets a field defined in {@link DBDeviceField} to {@param value}
      */
-    public void set(DBDeviceField field, Object value) {
+    public void set(DBDevicePrefField field, Object value) {
         // _id is read only
-        if (field == DEVICE_ID)
-            throw new IllegalArgumentException("Cannot set the _id value for a device." +
+        if (field == PREF_ID)
+            throw new IllegalArgumentException("Cannot set the _id value for a preference. " +
                     "It is generated automatically and immutable.");
 
         set(field.getKey(), value);
@@ -74,7 +74,7 @@ public class DBDevice  implements DBInstance {
     /**
      * Removes the specified field from the remote object
      */
-    public void remove(DBDeviceField field) {
+    public void remove(DBDevicePrefField field) {
         doc.remove(field.getKey());
 
         if (writeMode == DBWriteMode.AUTOMATIC)
@@ -82,10 +82,10 @@ public class DBDevice  implements DBInstance {
     }
 
     /**
-     * Returns whether the current {@link DBDevice} instance is
-     * in the database. False when (1) the device was just created and
-     * hasn't been written to the database, or (2) a failed to load from
-     * the database
+     * Returns whether the current {@link DBDevicePref} instance is
+     * in the database. False when (1) the object was just created and
+     * hasn't been written to the db yet, or (2) a preference
+     * failed to load from the database
      */
     public boolean doesExistInDB() {
         return existsInDB;
@@ -96,7 +96,7 @@ public class DBDevice  implements DBInstance {
             db.insertNew(doc);
             existsInDB = true;
         } else
-            db.update(doc); // TODO make more sophisticated, with update queue
+            db.update(doc);
     }
 
     /**
@@ -126,23 +126,6 @@ public class DBDevice  implements DBInstance {
             throw new IllegalArgumentException("Cannot delete a remote device object that is not in the database.");
         db.delete(doc);
         doc = null;
-    }
-
-    /**
-     * Gets all devices associated with specified
-     * donor / student and returns a list containing
-     * their IDs
-     */
-    public static List<ObjectId> getDevicesByUser(ObjectId userId, boolean isDonor) {
-        DBField field = isDonor ? DEVICE_DONOR : DEVICE_ASSIGNED_STUDENT;
-        FindIterable<Document> iterable = db.getDocumentsByField( field, userId);
-        List<ObjectId> list = new ArrayList<>();
-
-        // transforms iterable of device docs into list of device ids
-        iterable.map(doc -> doc.getObjectId(DEVICE_ID.getKey()))
-                .forEach(list::add);
-
-        return list;
     }
 
 }
