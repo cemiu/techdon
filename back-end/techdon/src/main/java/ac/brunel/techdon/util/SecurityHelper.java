@@ -2,9 +2,20 @@ package ac.brunel.techdon.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.UUID;
 
-public class HashingHelper {
+
+public class SecurityHelper {
+	private static final SecureRandom secureRandom = new SecureRandom();
+	private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
+	
+	public static String generateAuthKey() {
+		byte[] randomBytes = new byte[128];
+	    secureRandom.nextBytes(randomBytes);
+	    return base64Encoder.encodeToString(randomBytes);
+	}
 
     /**
      * Takes an unsalted, clear-text password and a salt

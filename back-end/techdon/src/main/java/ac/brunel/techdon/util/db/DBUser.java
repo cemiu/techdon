@@ -8,7 +8,7 @@ import ac.brunel.techdon.util.db.support.DBWriteMode;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
-public abstract class DBUser implements DBInstance {
+public class DBUser implements DBInstance {
 
     private static final DBInterface db = new DBInterface("users");
 

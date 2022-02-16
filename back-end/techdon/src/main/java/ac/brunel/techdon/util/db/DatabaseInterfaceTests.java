@@ -2,7 +2,7 @@ package ac.brunel.techdon.util.db;
 
 import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.device.DeviceType;
-import ac.brunel.techdon.util.HashingHelper;
+import ac.brunel.techdon.util.SecurityHelper;
 import org.bson.Document;
 import org.bson.assertions.Assertions;
 import org.bson.types.ObjectId;
@@ -73,7 +73,7 @@ public class DatabaseInterfaceTests {
         donor.set(EMAIL, "donor@gmail.com");
 
         String salt = UUID.randomUUID().toString();
-        donor.set(PASSWORD_HASH, HashingHelper.getHash("abc123", salt));
+        donor.set(PASSWORD_HASH, SecurityHelper.getHash("abc123", salt));
         donor.set(PASSWORD_SALT, salt);
         donor.set(CREATION_DATE, Instant.now().getEpochSecond());
         donor.set(AUTH_TOKENS, Arrays.asList("R9SAUCVDWEYGZH2K4M5N7Q8R9TBUCVEXFYG2J3K4N6P7Q9SATBUDWEXFZH", "R9SAUCVDWEYGZH2K4M5N7Q8R9TBUCVEXFYG2J3K4N6P7Q9SATBUDWEXFZI"));
@@ -93,7 +93,7 @@ public class DatabaseInterfaceTests {
         student.set(EMAIL, "student@gmail.com");
 
         String salt = UUID.randomUUID().toString();
-        student.set(PASSWORD_HASH, HashingHelper.getHash("abc123", salt));
+        student.set(PASSWORD_HASH, SecurityHelper.getHash("abc123", salt));
         student.set(PASSWORD_SALT, salt);
 
         student.set(CREATION_DATE, Instant.now().getEpochSecond());

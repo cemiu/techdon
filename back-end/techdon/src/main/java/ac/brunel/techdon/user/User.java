@@ -4,17 +4,19 @@ import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.bson.types.ObjectId;
 
-import ac.brunel.techdon.util.HashingHelper;
+import ac.brunel.techdon.util.SecurityHelper;
 import ac.brunel.techdon.util.db.DBUser;
 
 public class User {
 	private DBUser dbUser;
-	
+
 	protected ObjectId userId;
 	protected String firstName;
 	protected String lastName;
@@ -25,31 +27,28 @@ public class User {
 	protected List<String> address;
 	protected long creationDate;
 	protected List<String> authTokens;
-	
-	protected User() {}
-	
+
+	protected User() {
+	}
+
 	/**
-	 * Constructor for superclass User,
-	 * used in the Student and Donor subclasses
+	 * Constructor for superclass User, used in the Student and Donor subclasses
 	 */
-	public User(String firstName, String lastName,
-			String email, String password,
-			String phone, 
-			List<String> address) {
+	public User(String firstName, String lastName, String email, String password, String phone, List<String> address) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
 		this.passwordSalt = UUID.randomUUID().toString();
-		this.passwordHash = HashingHelper.getHash(password, passwordSalt);
+		this.passwordHash = SecurityHelper.getHash(password, passwordSalt);
 		this.phone = phone;
 		this.address = address;
 		this.creationDate = Instant.now().getEpochSecond();
 		this.authTokens = new ArrayList<>();
 	}
-	
+
 	protected void init(DBUser dbUser) {
 		this.dbUser = dbUser;
-		
+
 		userId = (ObjectId) dbUser.get(ID);
 		// TODO: write to db
 		dbUser.set(EMAIL, email);
@@ -63,16 +62,61 @@ public class User {
 		dbUser.set(ADDRESS, address);
 	}
 	
+	
+	/**
+	 * Loads all fields that would be used by getting them from the db
+	 */
 	protected void load(DBUser dbUser) {
 		this.dbUser = dbUser;
-		
+
 		// load from database
 		firstName = dbUser.getString(FIRST_NAME);
-		// TODO: all other fields
+		lastName = dbUser.getString(LAST_NAME);
+		email = dbUser.getString(EMAIL);
+		phone = dbUser.getString(PHONE);
+		// address = (List<String>) dbUser.get(ADDRESS);
+		Object addressObj = dbUser.get(ADDRESS);
+		if (addressObj instanceof List<?>)
+			this.address = (List<String>) addressObj;
+		else
+			this.address = new ArrayList<>();
+		Object authTokensObj = dbUser.get(ADDRESS);
+		if (authTokensObj instanceof List<?>)
+			this.authTokens = (List<String>) authTokensObj;
+		else
+			this.authTokens = new ArrayList<>();
+
+	}
+
+	// TODO: deleting accounts
+
+	/**
+	 * Generates a new authentication token when a user
+	 * logs in and checks whether the token is unique.
+	 * Adds the new token to the list of tokens, writes the list
+	 * to the db and returns the new token
+	 */
+	public String logIn() {
+		boolean isUnique = false;
+		String newToken = null;
+		while (!isUnique) {
+			newToken = SecurityHelper.generateAuthKey();
+			DBUser checkUser = new DBUser(DBUser.Id.AUTH_TOKEN, newToken);
+			isUnique = !checkUser.doesExistInDB();
+		}
+		authTokens.add(newToken);
+		dbUser.set(AUTH_TOKENS, authTokens);
+		return newToken;
 	}
 	
-	// TODO: write methods for loggin in, logging out, deleting accounts
-	// TODO: fix getters and setters to update account and change in db
+	/**
+	 * When a user logs out removes the token from the
+	 * list and writes the changed list to the db
+	 */
+	public void logOut(String authToken) {
+		authTokens.remove(authToken);
+		dbUser.set(AUTH_TOKENS, authTokens);
+	}
 
 	public String getFirstName() {
 		return firstName;
@@ -80,6 +124,7 @@ public class User {
 
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
+		dbUser.set(FIRST_NAME, firstName);
 	}
 
 	public String getLastName() {
@@ -88,6 +133,7 @@ public class User {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+		dbUser.set(LAST_NAME, lastName);
 	}
 
 	public String getEmail() {
@@ -96,6 +142,7 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
+		dbUser.set(EMAIL, email);
 	}
 
 	public String getPhone() {
@@ -104,6 +151,7 @@ public class User {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
+		dbUser.set(PHONE, phone);
 	}
 
 	public List<String> getAddress() {
@@ -112,5 +160,6 @@ public class User {
 
 	public void setAddress(List<String> address) {
 		this.address = address;
+		dbUser.set(ADDRESS, address);
 	}
 }
