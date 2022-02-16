@@ -12,7 +12,7 @@ public abstract class DBUser implements DBInstance {
 
     private static final DBInterface db = new DBInterface("users");
 
-    private DBWriteMode writeMode = DBWriteMode.MANUAL;
+    private DBWriteMode writeMode = DBWriteMode.AUTOMATIC;
     public Document doc;
     private boolean existsInDB = true;
 
@@ -21,6 +21,7 @@ public abstract class DBUser implements DBInstance {
      * To be called from DBStudent / DBDonor exclusively
      */
     protected DBUser() {
+        writeMode = DBWriteMode.MANUAL;
         this.existsInDB = false;
 
         this.doc = new Document();
@@ -111,6 +112,16 @@ public abstract class DBUser implements DBInstance {
         if (writeMode != DBWriteMode.AUTOMATIC && newMode == DBWriteMode.AUTOMATIC)
             write();
         writeMode = newMode;
+    }
+
+    /**
+     * Deletes the device from the database
+     */
+    public void delete() {
+        if (!existsInDB)
+            throw new IllegalArgumentException("Cannot delete a remote device object that is not in the database.");
+        db.delete(doc);
+        doc = null;
     }
 
     /**

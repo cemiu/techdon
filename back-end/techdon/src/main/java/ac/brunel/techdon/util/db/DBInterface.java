@@ -66,6 +66,16 @@ public class DBInterface {
         return collection.find(and(eqs)).first();
     }
 
+    /**
+     * Returns the document with the smallest value for the minimizing field
+     */
+    public Document getDocumentByMinField(String minimizingField, String selectingField, Object value) {
+        if (minimizingField == null || selectingField == null || value == null || minimizingField.equals("") || selectingField.equals(""))
+            throw new IllegalArgumentException("Cannot lookup DB Document in " +
+                    collectionName + " with value " + value + " in field " + minimizingField);
+        return collection.find(eq(selectingField, value)).sort(new Document(minimizingField, 1)).first();
+    }
+
     private FindIterable<Document> getDocumentsByField(String field, ObjectId id) {
         if (field == null || id == null || field.equals(""))
             throw new IllegalArgumentException("Cannot lookup DB Document in " +

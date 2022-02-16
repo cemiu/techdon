@@ -17,11 +17,12 @@ public class DBDevice  implements DBInstance {
 
     private static final DBInterface db = new DBInterface("devices");
 
-    private DBWriteMode writeMode = DBWriteMode.MANUAL;
+    private DBWriteMode writeMode = DBWriteMode.AUTOMATIC;
     public Document doc;
     private boolean existsInDB = true;
 
     public DBDevice() {
+        writeMode = DBWriteMode.MANUAL;
         existsInDB = false;
         doc = new Document();
         doc.put("_id", new ObjectId());
@@ -111,8 +112,6 @@ public class DBDevice  implements DBInstance {
      * it writes all unwritten changes to the database
      */
     public void setWriteMode(DBWriteMode newMode) {
-        // TODO only write, if there is anything to write (once write queue has
-        //  been implemented)
         if (writeMode != DBWriteMode.AUTOMATIC && newMode == DBWriteMode.AUTOMATIC)
             write();
         writeMode = newMode;
@@ -135,7 +134,7 @@ public class DBDevice  implements DBInstance {
      */
     public static List<ObjectId> getDevicesByUser(ObjectId userId, boolean isDonor) {
         DBField field = isDonor ? DEVICE_DONOR : DEVICE_ASSIGNED_STUDENT;
-        FindIterable<Document> iterable = db.getDocumentsByField( field, userId);
+        FindIterable<Document> iterable = db.getDocumentsByField(field, userId);
         List<ObjectId> list = new ArrayList<>();
 
         // transforms iterable of device docs into list of device ids

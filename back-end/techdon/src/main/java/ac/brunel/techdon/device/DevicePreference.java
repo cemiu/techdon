@@ -2,11 +2,14 @@ package ac.brunel.techdon.device;
 
 import static ac.brunel.techdon.util.db.fields.DBDevicePrefField.*;
 
+import ac.brunel.techdon.util.db.DBDevice;
 import ac.brunel.techdon.util.db.DBDevicePref;
+import ac.brunel.techdon.util.db.support.DBPreferences;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
 import org.bson.types.ObjectId;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,13 +32,25 @@ public class DevicePreference {
     private DevicePreference() {}
 
     /**
-     * Loads
+     * Loads a particular preference from the database.
+     * If the preference does not exist, it is created, if
+     * the creation flag is set to true.
      */
     public DevicePreference(ObjectId studentId, DeviceType deviceType, boolean createIfNotExists) {
         // 1: attempt to load
+        dbPref = new DBDevicePref(studentId, deviceType);
+        if (dbPref.doesExistInDB()) {
+            this.prefId = (ObjectId) dbPref.get(PREF_ID);
+            this.deviceType = DeviceType.typeFromString(dbPref.getString(PREF_TYPE));
+            this.selectionDate = dbPref.getLong(PREF_DATE);
+            this.isPrefInQueue = dbPref.getBoolean(PREF_IS_IN_QUEUE);
+            return;
+        }
 
         if (!createIfNotExists)
-            return;
+            throw new IllegalArgumentException("Preference for " + deviceType.toString()
+                    + " does not exist by " + studentId.toString());
+
         // 2: if not found, create
         dbPref = new DBDevicePref();
         this.studentId = studentId;
@@ -82,10 +97,13 @@ public class DevicePreference {
     /**
      * Returns the preference with the associated student
      * that is next in queue to receive a device.
+     * Returns null if no student is in queue.
      */
     public static DevicePreference getNextInQueueForDevice(DeviceType deviceType) {
-        // TODO
-        return null;
+        ObjectId owningStudentId = DBDevicePref.getNextInQueueForDevice(deviceType);
+        if (owningStudentId == null)
+            return null;
+        return new DevicePreference(owningStudentId, deviceType, false);
     }
 
     /**
@@ -93,8 +111,7 @@ public class DevicePreference {
      * as a list of device types preferred by them.
      */
     public static List<String> getPreferredDevicesByStudent(ObjectId studentId) {
-        // TODO
-        return null;
+        return DBDevicePref.getPreferredDevicesByStudent(studentId);
     }
 
 }

@@ -3,18 +3,25 @@ package ac.brunel.techdon.util.db;
 import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.db.fields.DBDeviceField;
 import ac.brunel.techdon.util.db.fields.DBDevicePrefField;
+import ac.brunel.techdon.util.db.fields.DBField;
 import ac.brunel.techdon.util.db.support.DBInstance;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
+import com.mongodb.client.FindIterable;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import static ac.brunel.techdon.util.db.fields.DBDeviceField.*;
 import static ac.brunel.techdon.util.db.fields.DBDevicePrefField.*;
 
 public class DBDevicePref implements DBInstance {
 
     private static final DBInterface db = new DBInterface("device_preferences");
 
-    private DBWriteMode writeMode = DBWriteMode.MANUAL;
+    private DBWriteMode writeMode = DBWriteMode.AUTOMATIC;
     public Document doc;
     private boolean existsInDB = true;
 
@@ -23,6 +30,7 @@ public class DBDevicePref implements DBInstance {
      * for manual initialization
      */
     public DBDevicePref() {
+        writeMode = DBWriteMode.MANUAL;
         existsInDB = false;
         doc = new Document();
         doc.put("_id", new ObjectId());
@@ -48,7 +56,12 @@ public class DBDevicePref implements DBInstance {
      * sure that the device loaded correctly
      */
     public DBDevicePref(ObjectId studentId, DeviceType deviceType) {
-        this.doc = db.getDocumentByField((String) null, (String) null); // TODO !!!!!!!!!!!!!
+        HashMap<String, Object> query = new HashMap<>();
+        query.put(PREF_STUDENT_ID.getKey(), studentId);
+        query.put(PREF_TYPE.getKey(), deviceType.toString());
+        this.doc = db.getDocumentByFields(query);
+        if (this.doc == null)
+            existsInDB = false;
     }
 
     /**
@@ -121,8 +134,6 @@ public class DBDevicePref implements DBInstance {
      * it writes all unwritten changes to the database
      */
     public void setWriteMode(DBWriteMode newMode) {
-        // TODO only write, if there is anything to write (once write queue has
-        //  been implemented)
         if (writeMode != DBWriteMode.AUTOMATIC && newMode == DBWriteMode.AUTOMATIC)
             write();
         writeMode = newMode;
@@ -136,6 +147,31 @@ public class DBDevicePref implements DBInstance {
             throw new IllegalArgumentException("Cannot delete a remote device object that is not in the database.");
         db.delete(doc);
         doc = null;
+    }
+
+    /**
+     * Returns the id of the student next in line for a particular device
+     */
+    public static ObjectId getNextInQueueForDevice(DeviceType deviceType) {
+        Document minDoc = db.getDocumentByMinField(PREF_DATE.getKey(), DEVICE_TYPE.getKey(), deviceType.toString());
+        if (minDoc == null || minDoc.getObjectId(PREF_STUDENT_ID.getKey()) == null)
+            return null;
+        return db.getDocumentByMinField(PREF_DATE.getKey(), DEVICE_TYPE.getKey(), deviceType.toString())
+                .getObjectId(PREF_STUDENT_ID);
+    }
+
+    /**
+     * Gets all files which a student set a preference for
+     */
+    public static List<String> getPreferredDevicesByStudent(ObjectId studentId) {
+        FindIterable<Document> iterable = db.getDocumentsByField(PREF_STUDENT_ID, studentId);
+        List<String> list = new ArrayList<>();
+
+        // transforms iterable of preferences into list of device types
+        iterable.map(doc -> doc.getString(PREF_TYPE.getKey()))
+                .forEach(list::add);
+
+        return list;
     }
 
 }
