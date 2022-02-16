@@ -17,11 +17,12 @@ public class DBDevice  implements DBInstance {
 
     private static final DBInterface db = new DBInterface("devices");
 
-    private DBWriteMode writeMode = DBWriteMode.MANUAL;
+    private DBWriteMode writeMode = DBWriteMode.AUTOMATIC;
     public Document doc;
     private boolean existsInDB = true;
 
     public DBDevice() {
+        writeMode = DBWriteMode.MANUAL;
         existsInDB = false;
         doc = new Document();
         doc.put("_id", new ObjectId());
@@ -52,23 +53,11 @@ public class DBDevice  implements DBInstance {
      * Sets a field in the database, for internal use only
      * Use {@link #set(DBDeviceField, Object)} for external, safe use
      */
-    protected void set(String field, Object value) {
-        String[] path = field.split("/");
-
-        if (path.length == 1)
-            doc.put(field, value);
-        else if (path.length == 2) {
-            Document subDoc = (Document) doc.get(path[0]);
-            if (subDoc == null)
-                subDoc = new Document();
-            subDoc.put(path[1], value);
-        } else
-            throw new IllegalArgumentException("Path " + field + " contains two sub-objects." +
-                    "Try limiting yourself to one object; if you can't, talk to Philipp to expand functionality.");
+    private void set(String field, Object value) {
+        doc.put(field, value);
 
         if (writeMode == DBWriteMode.AUTOMATIC)
-            write(); // TODO write the entire document, or just write differences since last write
-        // TODO rewrite method to make prettier
+            write();
     }
 
     /**
@@ -77,8 +66,8 @@ public class DBDevice  implements DBInstance {
     public void set(DBDeviceField field, Object value) {
         // _id is read only
         if (field == DEVICE_ID)
-            throw new IllegalArgumentException("Cannot set the _id value for a user." +
-                    "It is generated automatically and read only");
+            throw new IllegalArgumentException("Cannot set the _id value for a device." +
+                    "It is generated automatically and immutable.");
 
         set(field.getKey(), value);
     }
@@ -89,15 +78,15 @@ public class DBDevice  implements DBInstance {
     public void remove(DBDeviceField field) {
         doc.remove(field.getKey());
 
-        // TODO update single value instead of entire document
         if (writeMode == DBWriteMode.AUTOMATIC)
             write();
     }
 
     /**
-     * Returns whether the current {@link DBUser} instance is
-     * in the database. False when (1) the user was just created or
-     * (2) a user couldn't be found in the database
+     * Returns whether the current {@link DBDevice} instance is
+     * in the database. False when (1) the device was just created and
+     * hasn't been written to the database, or (2) a failed to load from
+     * the database
      */
     public boolean doesExistInDB() {
         return existsInDB;
@@ -123,8 +112,6 @@ public class DBDevice  implements DBInstance {
      * it writes all unwritten changes to the database
      */
     public void setWriteMode(DBWriteMode newMode) {
-        // TODO only write, if there is anything to write (once write queue has
-        //  been implemented)
         if (writeMode != DBWriteMode.AUTOMATIC && newMode == DBWriteMode.AUTOMATIC)
             write();
         writeMode = newMode;
@@ -147,7 +134,7 @@ public class DBDevice  implements DBInstance {
      */
     public static List<ObjectId> getDevicesByUser(ObjectId userId, boolean isDonor) {
         DBField field = isDonor ? DEVICE_DONOR : DEVICE_ASSIGNED_STUDENT;
-        FindIterable<Document> iterable = db.getDocumentsByField( field, userId);
+        FindIterable<Document> iterable = db.getDocumentsByField(field, userId);
         List<ObjectId> list = new ArrayList<>();
 
         // transforms iterable of device docs into list of device ids

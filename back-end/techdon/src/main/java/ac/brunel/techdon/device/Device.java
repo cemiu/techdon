@@ -58,7 +58,7 @@ public class Device {
         dbDevice = new DBDevice();
         deviceId = (ObjectId) dbDevice.get(DEVICE_ID);
         dbDevice.set(DEVICE_DONOR, donor);
-        dbDevice.set(DEVICE_TYPE, type.getName());
+        dbDevice.set(DEVICE_TYPE, type.toString());
         dbDevice.set(DEVICE_NAME, name);
         dbDevice.set(DEVICE_LISTING_DATE, listingDate);
 
@@ -224,7 +224,7 @@ public class Device {
      */
     public void setType(DeviceType type) {
         this.type = type;
-        dbDevice.set(DEVICE_TYPE, type.getName());
+        dbDevice.set(DEVICE_TYPE, type.toString());
     }
 
     /**
@@ -365,9 +365,8 @@ public class Device {
     }
 
     /**
-     * 
-     * 
-     * 
+     * Returns a list of device ids belonging to a student
+     * in string format
      */
     public static List<String> getDevicesByStudent(ObjectId studentId) {
         List<String> list = new ArrayList<>();

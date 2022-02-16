@@ -6,7 +6,7 @@ package ac.brunel.techdon.util.db.fields;
  */
 public enum DBDonorField implements DBField {
 
-	TEMP(null);
+	;
 	
     private final String key;
 

@@ -16,10 +16,6 @@ public enum DeviceType {
         this.name = name;
     }
 
-    public String getName() {
-        return name;
-    }
-
     /**
      * Returns a device type given the type's descriptor string
      */
@@ -34,4 +30,8 @@ public enum DeviceType {
         };
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
 }

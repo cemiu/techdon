@@ -5,9 +5,6 @@ public enum DBUserField implements DBField {
     ID("_id"), // objectId, auto-generated
     USER_ROLE("user_type"), // string, (student / donor, admin)
     EMAIL("email"), // string
-    EMAIL_HAS_BEEN_VERIFIED("email_has_been_verified"),
-    EMAIL_UPDATED_UNVERIFIED("email_updated_unverified"), // set when user updates their email
-                                                              // moved to "email" field upon verification 
     PASSWORD_HASH("password_hash"), // string, sha256 (?)
     PASSWORD_SALT("password_salt"), // string, uuid-4
     CREATION_DATE("creation_date"), // long, unix time
