@@ -19,17 +19,4 @@ public enum DBStudentField implements DBField {
         return key;
     }
 
-    public enum SelectionField {
-
-        DEVICE_SELECTION_TYPE("type"),
-        DEVICE_SELECTION_DATE("selection_data"); // unix time, long
-
-        private final String key;
-
-        SelectionField(String key) {
-            this.key = key;
-        }
-
-    }
-
 }

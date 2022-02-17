@@ -2,6 +2,7 @@ package ac.brunel.techdon.util.db.support;
 
 import ac.brunel.techdon.util.db.fields.DBField;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bson.types.ObjectId;
@@ -70,6 +71,15 @@ public interface DBInstance {
 
     default ObjectId getObjectId(DBField field) {
         return getObjectId(field.getKey());
+    }
+
+    default <T> List<T> getList(String key, Class<T> t) {
+        List<T> list = get(key, List.class);
+        return list != null ? list : new ArrayList<>();
+    }
+
+    default <T> List<T> getList(DBField field, Class<T> t) {
+            return getList(field.getKey(), t);
     }
 
 }

@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 
 public class Device {
 
@@ -76,7 +75,7 @@ public class Device {
 
     /**
      * Loads a device, belonging to a particular student / donor,
-     * Set the userId to the user's object Id, and isDonor to true
+     * Set the userId to the user's object id, and isDonor to true
      * or false depending on whether the queried user is a student or donor
      */
     public Device(String deviceId, ObjectId userId, boolean isDonor) {

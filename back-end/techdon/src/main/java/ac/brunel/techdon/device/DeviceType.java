@@ -34,4 +34,5 @@ public enum DeviceType {
     public String toString() {
         return name;
     }
+
 }

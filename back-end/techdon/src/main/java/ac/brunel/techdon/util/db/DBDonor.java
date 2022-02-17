@@ -1,6 +1,5 @@
 package ac.brunel.techdon.util.db;
 
-import static ac.brunel.techdon.util.db.fields.DBDonorField.*;
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 
 import ac.brunel.techdon.device.Device;

@@ -97,7 +97,7 @@ public class DBDevice  implements DBInstance {
             db.insertNew(doc);
             existsInDB = true;
         } else
-            db.update(doc); // TODO make more sophisticated, with update queue
+            db.update(doc);
     }
 
     /**

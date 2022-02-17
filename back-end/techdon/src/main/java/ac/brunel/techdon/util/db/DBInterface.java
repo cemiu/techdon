@@ -108,15 +108,7 @@ public class DBInterface {
     }
 
     public void delete(ObjectId id) {
-        collection.findOneAndDelete(eq("_id", id)); // TODO does matching work with string id ?
-    }
-
-    /**
-     * Pushes a new document to an object array
-     * TODO throw error when object id is unknown
-     */
-    public void push(ObjectId id, DBField field, Document doc) {
-        query("push", id, field.getKey(), doc);
+        collection.findOneAndDelete(eq("_id", id));
     }
 
     /**

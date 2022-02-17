@@ -2,14 +2,11 @@ package ac.brunel.techdon.device;
 
 import static ac.brunel.techdon.util.db.fields.DBDevicePrefField.*;
 
-import ac.brunel.techdon.util.db.DBDevice;
 import ac.brunel.techdon.util.db.DBDevicePref;
-import ac.brunel.techdon.util.db.support.DBPreferences;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
 import org.bson.types.ObjectId;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,8 +18,6 @@ import java.util.List;
 public class DevicePreference {
 
     DBDevicePref dbPref;
-
-    private ObjectId prefId;
 
     private ObjectId studentId;
     private DeviceType deviceType;
@@ -40,7 +35,6 @@ public class DevicePreference {
         // 1: attempt to load
         dbPref = new DBDevicePref(studentId, deviceType);
         if (dbPref.doesExistInDB()) {
-            this.prefId = (ObjectId) dbPref.get(PREF_ID);
             this.deviceType = DeviceType.typeFromString(dbPref.getString(PREF_TYPE));
             this.selectionDate = dbPref.getLong(PREF_DATE);
             this.isPrefInQueue = dbPref.getBoolean(PREF_IS_IN_QUEUE);
@@ -48,7 +42,7 @@ public class DevicePreference {
         }
 
         if (!createIfNotExists)
-            throw new IllegalArgumentException("Preference for " + deviceType.toString()
+            throw new IllegalArgumentException("Preference for " + deviceType
                     + " does not exist by " + studentId.toString());
 
         // 2: if not found, create
@@ -59,7 +53,6 @@ public class DevicePreference {
         this.isPrefInQueue = true;
 
         dbPref = new DBDevicePref();
-        prefId = (ObjectId) dbPref.get(PREF_ID);
         dbPref.set(PREF_STUDENT_ID, studentId);
         dbPref.set(PREF_TYPE, deviceType.toString());
         dbPref.set(PREF_DATE, selectionDate);
@@ -92,6 +85,14 @@ public class DevicePreference {
      */
     public void removePreference() {
         dbPref.delete();
+    }
+
+    public ObjectId getStudentId() {
+        return studentId;
+    }
+
+    public DeviceType getDeviceType() {
+        return deviceType;
     }
 
     /**

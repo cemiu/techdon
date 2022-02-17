@@ -74,18 +74,8 @@ public class User {
 		lastName = dbUser.getString(LAST_NAME);
 		email = dbUser.getString(EMAIL);
 		phone = dbUser.getString(PHONE);
-		// address = (List<String>) dbUser.get(ADDRESS);
-		Object addressObj = dbUser.get(ADDRESS);
-		if (addressObj instanceof List<?>)
-			this.address = (List<String>) addressObj;
-		else
-			this.address = new ArrayList<>();
-		Object authTokensObj = dbUser.get(ADDRESS);
-		if (authTokensObj instanceof List<?>)
-			this.authTokens = (List<String>) authTokensObj;
-		else
-			this.authTokens = new ArrayList<>();
-
+		address = dbUser.getList(ADDRESS, String.class);
+		authTokens = dbUser.getList(AUTH_TOKENS, String.class);
 	}
 
 	// TODO: deleting accounts

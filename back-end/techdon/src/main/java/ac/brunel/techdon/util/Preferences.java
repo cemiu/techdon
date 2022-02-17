@@ -75,8 +75,10 @@ public class Preferences {
             try {
                 // bson libraries can output documents as json, but do not format it
                 // maybe include json library with formatting capabilities later (?)
-                if (!PREF_DIR.exists())
-                    PREF_DIR.mkdirs();
+                if (!PREF_DIR.exists() && !PREF_DIR.mkdirs()) {
+                    System.err.println("Failed to create directory: " + PREF_DIR.getAbsolutePath());
+                    System.exit(1);
+                }
                 BufferedWriter writer = new BufferedWriter(new FileWriter(PREF_FILE, StandardCharsets.UTF_8));
                 writer.write("{\n" +
                         "\t\"pref_version\": " + PREF_VERSION + ",\n" +

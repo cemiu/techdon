@@ -36,7 +36,7 @@ public class DBUser implements DBInstance {
         if (mode == Id.EMAIL)
             id = id.toLowerCase();
 
-        this.doc = db.getDocumentByField(mode.key, id);
+        this.doc = db.getDocumentByField(mode.getAuthField(), id);
         if (this.doc == null)
             existsInDB = false;
     }
@@ -108,7 +108,6 @@ public class DBUser implements DBInstance {
      * write mode is automatic
      */
     public void setWriteMode(DBWriteMode newMode) {
-        // TODO only write if there is anything to write
         if (writeMode != DBWriteMode.AUTOMATIC && newMode == DBWriteMode.AUTOMATIC)
             write();
         writeMode = newMode;

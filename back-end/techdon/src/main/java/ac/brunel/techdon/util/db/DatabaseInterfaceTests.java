@@ -3,12 +3,11 @@ package ac.brunel.techdon.util.db;
 import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.SecurityHelper;
-import org.bson.Document;
-import org.bson.assertions.Assertions;
 import org.bson.types.ObjectId;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
@@ -23,9 +22,18 @@ import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
 public class DatabaseInterfaceTests {
 
     public static void main(String[] args) {
-        createDummyStudent();
-    	//addDevice();
-        //modifyDevice();
+        loadStringList();
+    }
+
+    private static void loadStringList() {
+        DBStudent student = new DBStudent(DBUser.Id.AUTH_TOKEN, "FYH2J3K5N6P7R9SATBVDWEXGZH2J4M5N6Q8R9SBUCVDXFYGZJ3K4M6P7Q8");
+        List<String> auths = student.getList(AUTH_TOKENS, String.class);
+        System.out.println(auths);
+        System.out.println(auths.getClass());
+        if (auths.size() > 0) {
+            System.out.println(auths.get(0));
+            System.out.println(auths.get(0).getClass());
+        }
     }
 
     private static void loadAllDevices() {
@@ -111,14 +119,7 @@ public class DatabaseInterfaceTests {
 
         student.set(UNIVERSITY, "Brunel University");
         student.set(COUNTRY, "United Kingdom");
-        /*student.set(DEVICE_SELECTION, Arrays.asList(
-                new Document("type", DeviceType.LAPTOP)
-                        .append("date_selected", Instant.now().getEpochSecond()),
-                new Document("type", DeviceType.HARD_DRIVE)
-                        .append("date_selected", Instant.now().getEpochSecond()),
-                new Document("type", DeviceType.MONITOR)
-                        .append("date_selected", Instant.now().getEpochSecond())
-        ));*/
+
         student.write();
     }
 
