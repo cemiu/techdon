@@ -73,6 +73,7 @@ public class DBInterface {
         if (minimizingField == null || selectingField == null || value == null || minimizingField.equals("") || selectingField.equals(""))
             throw new IllegalArgumentException("Cannot lookup DB Document in " +
                     collectionName + " with value " + value + " in field " + minimizingField);
+
         return collection.find(eq(selectingField, value)).sort(new Document(minimizingField, 1)).first();
     }
 

@@ -18,7 +18,7 @@ public class DBDevice  implements DBInstance {
     private static final DBInterface db = new DBInterface("devices");
 
     private DBWriteMode writeMode = DBWriteMode.AUTOMATIC;
-    public Document doc;
+    private Document doc;
     private boolean existsInDB = true;
 
     public DBDevice() {

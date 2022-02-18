@@ -341,6 +341,8 @@ public class Device {
      * a list of all device ids donated by them
      */
     public static List<ObjectId> getDeviceIdsByDonor(ObjectId donorId) {
+        if (donorId == null)
+            return null;
         return DBDevice.getDevicesByUser(donorId, true);
     }
     

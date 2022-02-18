@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import static ac.brunel.techdon.util.db.fields.DBDeviceField.*;
 import static ac.brunel.techdon.util.db.fields.DBDevicePrefField.*;
 
 public class DBDevicePref implements DBInstance {
@@ -21,7 +20,7 @@ public class DBDevicePref implements DBInstance {
     private static final DBInterface db = new DBInterface("device_preferences");
 
     private DBWriteMode writeMode = DBWriteMode.AUTOMATIC;
-    public Document doc;
+    private Document doc;
     private boolean existsInDB = true;
 
     /**
@@ -59,6 +58,15 @@ public class DBDevicePref implements DBInstance {
         query.put(PREF_STUDENT_ID.getKey(), studentId);
         query.put(PREF_TYPE.getKey(), deviceType.toString());
         this.doc = db.getDocumentByFields(query);
+        if (this.doc == null)
+            existsInDB = false;
+    }
+
+    /**
+     * Initializes the preference with an already loaded document
+     */
+    private DBDevicePref(Document doc) {
+        this.doc = doc;
         if (this.doc == null)
             existsInDB = false;
     }
@@ -149,14 +157,14 @@ public class DBDevicePref implements DBInstance {
     }
 
     /**
-     * Returns the id of the student next in line for a particular device
+     * Returns the preference document for the next in line
+     * for the specified device type
      */
-    public static ObjectId getNextInQueueForDevice(DeviceType deviceType) {
-        Document minDoc = db.getDocumentByMinField(PREF_DATE.getKey(), DEVICE_TYPE.getKey(), deviceType.toString());
+    public static DBDevicePref getNextInQueueForDevice(DeviceType deviceType) {
+        Document minDoc = db.getDocumentByMinField(PREF_DATE.getKey(), PREF_TYPE.getKey(), deviceType.toString());
         if (minDoc == null || minDoc.getObjectId(PREF_STUDENT_ID.getKey()) == null)
             return null;
-        return db.getDocumentByMinField(PREF_DATE.getKey(), DEVICE_TYPE.getKey(), deviceType.toString())
-                .getObjectId(PREF_STUDENT_ID);
+        return new DBDevicePref(minDoc);
     }
 
     /**

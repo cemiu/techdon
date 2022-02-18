@@ -24,6 +24,7 @@ public class DevicePreference {
     private long selectionDate;
     private boolean isPrefInQueue;
 
+    @SuppressWarnings("unused")
     private DevicePreference() {}
 
     /**
@@ -35,9 +36,7 @@ public class DevicePreference {
         // 1: attempt to load
         dbPref = new DBDevicePref(studentId, deviceType);
         if (dbPref.doesExistInDB()) {
-            this.deviceType = DeviceType.typeFromString(dbPref.getString(PREF_TYPE));
-            this.selectionDate = dbPref.getLong(PREF_DATE);
-            this.isPrefInQueue = dbPref.getBoolean(PREF_IS_IN_QUEUE);
+            load();
             return;
         }
 
@@ -59,6 +58,26 @@ public class DevicePreference {
         dbPref.set(PREF_IS_IN_QUEUE, isPrefInQueue);
 
         dbPref.setWriteMode(DBWriteMode.AUTOMATIC);
+    }
+
+    /**
+     * Loads a preference file, given an
+     * arbitrary db object.
+     */
+    public DevicePreference(DBDevicePref dbPref) {
+        this.dbPref = dbPref;
+        load();
+    }
+
+    /**
+     * Loads all fields from the remote object.
+     */
+    private void load() {
+        this.studentId = dbPref.getObjectId(PREF_STUDENT_ID);
+        this.deviceType = DeviceType.typeFromString(dbPref.getString(PREF_TYPE));
+        this.selectionDate = dbPref.getLong(PREF_DATE);
+        this.isPrefInQueue = dbPref.getBoolean(PREF_IS_IN_QUEUE);
+        return;
     }
 
     /**
@@ -101,10 +120,10 @@ public class DevicePreference {
      * Returns null if no student is in queue.
      */
     public static DevicePreference getNextInQueueForDevice(DeviceType deviceType) {
-        ObjectId owningStudentId = DBDevicePref.getNextInQueueForDevice(deviceType);
-        if (owningStudentId == null)
+        DBDevicePref dbPref = DBDevicePref.getNextInQueueForDevice(deviceType);
+        if (dbPref == null)
             return null;
-        return new DevicePreference(owningStudentId, deviceType, false);
+        return new DevicePreference(dbPref);
     }
 
     /**

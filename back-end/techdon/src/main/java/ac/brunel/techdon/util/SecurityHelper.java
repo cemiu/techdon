@@ -12,7 +12,7 @@ public class SecurityHelper {
 	private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 	
 	public static String generateAuthKey() {
-		byte[] randomBytes = new byte[128];
+		byte[] randomBytes = new byte[32];
 	    secureRandom.nextBytes(randomBytes);
 	    return base64Encoder.encodeToString(randomBytes);
 	}

@@ -52,9 +52,6 @@ public class DBDonor extends DBUser {
      * all devices donated by DBDonor instance
      */
     public List<ObjectId> getDeviceList() {
-        if (doc == null)
-            return null;
-
         return Device.getDeviceIdsByDonor(getId());
     }
 

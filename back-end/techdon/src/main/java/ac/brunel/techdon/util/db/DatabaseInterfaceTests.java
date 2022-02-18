@@ -1,6 +1,7 @@
 package ac.brunel.techdon.util.db;
 
 import ac.brunel.techdon.device.Device;
+import ac.brunel.techdon.device.DevicePreference;
 import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.SecurityHelper;
 import org.bson.types.ObjectId;
@@ -22,7 +23,23 @@ import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
 public class DatabaseInterfaceTests {
 
     public static void main(String[] args) {
-        loadStringList();
+        loadPreference();
+    }
+
+    private static void addPreference() {
+        DBStudent student = new DBStudent(DBUser.Id.AUTH_TOKEN, "FYH2J3K5N6P7R9SATBVDWEXGZH2J4M5N6Q8R9SBUCVDXFYGZJ3K4M6P7Q8");
+        DevicePreference preference = new DevicePreference(student.getId(), DeviceType.IPAD, true);
+
+    }
+
+    private static void loadPreference() {
+        DBStudent student = new DBStudent(DBUser.Id.AUTH_TOKEN, "FYH2J3K5N6P7R9SATBVDWEXGZH2J4M5N6Q8R9SBUCVDXFYGZJ3K4M6P7Q8");
+        DevicePreference preference = new DevicePreference(student.getId(), DeviceType.IPAD, false);
+        System.out.println("1: " + preference.getStudentId());
+        System.out.println("2: " + preference.getDeviceType());
+        System.out.println("3: " + DevicePreference.getPreferredDevicesByStudent(new ObjectId("61ab77b40be1bf0ad0193d99")));
+        System.out.println("4: " + DevicePreference.getNextInQueueForDevice(DeviceType.IPAD));
+        System.out.println("5: " + DevicePreference.getNextInQueueForDevice(DeviceType.LAPTOP));
     }
 
     private static void loadStringList() {
