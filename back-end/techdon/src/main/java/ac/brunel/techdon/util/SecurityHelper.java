@@ -11,8 +11,12 @@ public class SecurityHelper {
 	private static final SecureRandom secureRandom = new SecureRandom();
 	private static final Base64.Encoder base64Encoder = Base64.getUrlEncoder();
 	
+	/**
+	 * Generates a secure random authentication token
+	 * and returns it as base64 encoded string
+	 */
 	public static String generateAuthKey() {
-		byte[] randomBytes = new byte[32];
+		byte[] randomBytes = new byte[128];
 	    secureRandom.nextBytes(randomBytes);
 	    return base64Encoder.encodeToString(randomBytes);
 	}

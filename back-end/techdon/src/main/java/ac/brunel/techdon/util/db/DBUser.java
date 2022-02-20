@@ -122,6 +122,17 @@ public class DBUser implements DBInstance {
         db.delete(doc);
         doc = null;
     }
+    
+    /**
+     * Deletes user from the the database
+     */
+    // TODO: Consult with database developer
+    public void deleteUserAccount()  {
+    	if (!existsInDB)
+            throw new IllegalArgumentException("Cannot delete a user that is not in the database.");
+    	db.delete(doc);
+    	doc = null;
+    }
 
     /**
      * An enum that specifies which unique identifier

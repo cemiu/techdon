@@ -50,7 +50,6 @@ public class User {
 		this.dbUser = dbUser;
 
 		userId = (ObjectId) dbUser.get(ID);
-		// TODO: write to db
 		dbUser.set(EMAIL, email);
 		dbUser.set(PASSWORD_HASH, passwordHash);
 		dbUser.set(PASSWORD_SALT, passwordSalt);
@@ -78,8 +77,11 @@ public class User {
 		authTokens = dbUser.getList(AUTH_TOKENS, String.class);
 	}
 
-	// TODO: deleting accounts
-
+	// TODO: deleting accounts, consult with db developer
+	public void deleteAccount() {
+		dbUser.deleteUserAccount();
+	}
+	
 	/**
 	 * Generates a new authentication token when a user
 	 * logs in and checks whether the token is unique.
@@ -98,7 +100,7 @@ public class User {
 		dbUser.set(AUTH_TOKENS, authTokens);
 		return newToken;
 	}
-	
+
 	/**
 	 * When a user logs out removes the token from the
 	 * list and writes the changed list to the db
@@ -151,5 +153,14 @@ public class User {
 	public void setAddress(List<String> address) {
 		this.address = address;
 		dbUser.set(ADDRESS, address);
+	}
+	
+	public List<String> getAuthTokens() {
+		return authTokens;
+	}
+
+	public void setAuthTokens(List<String> authTokens) {
+		this.authTokens = authTokens;
+		dbUser.set(AUTH_TOKENS, authTokens);
 	}
 }

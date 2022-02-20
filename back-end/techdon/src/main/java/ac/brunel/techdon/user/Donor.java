@@ -29,8 +29,6 @@ public class Donor extends User {
 		dbDonor = new DBDonor();
 		super.init(dbDonor);
 		donatedDevices = new ArrayList<>();
-		
-		
 	}
 	
 	public Donor(String auth) {

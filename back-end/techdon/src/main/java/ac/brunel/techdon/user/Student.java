@@ -8,7 +8,10 @@ import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
 
 import org.bson.types.ObjectId;
 
+import ac.brunel.techdon.device.Device;
+import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBStudent;
+import ac.brunel.techdon.util.db.DBUser;
 
 public class Student extends User {
 
@@ -29,6 +32,12 @@ public class Student extends User {
 		super.init(dbStudent);
 		dbStudent.set(UNIVERSITY, university);
 		dbStudent.set(COUNTRY, country);
+	}
+	
+	public Student(String auth) {
+		super();
+		dbStudent = new DBStudent(DBUser.Id.AUTH_TOKEN, auth);
+		super.load(dbStudent);
 	}
 	
 	// TODO: fix getters and setters & add methods
