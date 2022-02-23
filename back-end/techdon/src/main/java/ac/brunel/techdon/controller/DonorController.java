@@ -1,5 +1,6 @@
 package ac.brunel.techdon.controller;
 
+import ac.brunel.techdon.controller.util.DeviceHelper;
 import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.db.DBDonor;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
@@ -46,17 +48,22 @@ public class DonorController {
         ObjectId donorId = donor.getObjectId(ID);
         List<String> deviceIds = Device.getDevicesByDonor(donorId);
 
-        // returns devices as json array
         return OK(deviceIds.toString());
     }
 
     /**
-     * end point to update the information of a donated device
-     * check documentation for more info on inputs / outputs expected
+     * endpoint for a donor to load a specific device
      */
     @GetMapping("/api/donor/device/load")
-    public String donorDeviceLoad() {
-        return null;
+    public ResponseEntity<String> donorDeviceLoad(
+            @RequestParam String authToken,
+            @RequestParam String deviceId
+    ) {
+        Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, true);
+        if (device == null)
+            return UNAUTHORIZED();
+
+        return OK(device.toDoc().toJson());
     }
 
     /**
@@ -68,20 +75,12 @@ public class DonorController {
             @RequestParam String authToken,
             @RequestParam String deviceId
     ) {
-        // TODO temp solution with DBDonor, while user object are still in development
-        //  update to interact with account / donor object once implemented
-
-        Device device;
-        try {
-            DBDonor donor = new DBDonor(DBUser.Id.AUTH_TOKEN, authToken); // invalid donor auth token
-            ObjectId donorId = donor.getObjectId(ID);
-            device = new Device(deviceId, donorId, true); // invalid device or user
-        } catch (RuntimeException e) {
+        Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, true);
+        if (device == null)
             return UNAUTHORIZED();
-        }
 
         device.deleteDevice(); // deletes the device
-        return OK("Successfully deleted device");
+        return OK_SIMPLE("Successfully deleted device");
     }
 
     /**
@@ -97,42 +96,32 @@ public class DonorController {
             @RequestParam(value = "deviceLocation", required = false) String deviceLocation,
             @RequestParam(value = "deviceDescription", required = false) String deviceDescription
     ) {
-        /* TODO temp solution with DBDonor, while user object are still in development
-        **  update to interact with account / donor object once implemented */
-
-        DBDonor donor;
-        Device device;
-        try {
-            donor = new DBDonor(DBUser.Id.AUTH_TOKEN, authToken); // invalid auth
-            ObjectId donorId = donor.getObjectId(ID);
-            device = new Device(deviceId, donorId, true); // invalid device
-        } catch (RuntimeException e) {
+        Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, true);
+        if (device == null)
             return UNAUTHORIZED();
-        }
 
         /* Validate the validity of all inputs prior to
         ** writing anything to the database */
         DeviceType safeType = null;
         String safeName = null, safeLocation = null, safeDescription = null;
-        if (deviceType != null)
+        if (deviceType != null && !deviceType.isEmpty())
             try {
                 safeType = DeviceType.typeFromString(deviceType); // unknown type
             } catch (IllegalArgumentException e) {
                 return BAD_REQUEST("Unknown device type");
             }
 
-        // TODO check for constraints (or specify in request)
-        if (deviceName != null) {
+        if (deviceName != null && !deviceName.isEmpty()) {
             if (deviceName.length() > 300)
                 return BAD_REQUEST("The name exceeds the upper character limit (300)");
             safeName = deviceName;
         }
 
-        if (deviceLocation != null) {
-            // TODO validate city or postcode
-            boolean isValid = true; // (temp, remove later)
+        if (deviceLocation != null && !deviceLocation.isEmpty()) {
+            Pattern pattern = Pattern.compile("[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}");
+            boolean isValid = pattern.matcher(deviceLocation).matches();
             if (!isValid)
-                return BAD_REQUEST("Location could not be resolved, try your postcode instead: 0AA 0AA");
+                return BAD_REQUEST("The postcode \"" + deviceLocation + "\" is invalid, try it in the format \"EC1A 1BB\" instead.");
             safeLocation = deviceLocation;
         }
 

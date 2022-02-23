@@ -4,6 +4,7 @@ import static ac.brunel.techdon.util.db.fields.DBDeviceField.*;
 
 import ac.brunel.techdon.util.db.DBDevice;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.security.access.AccessDeniedException;
 
@@ -376,4 +377,15 @@ public class Device {
         return list;
     }
 
+    /**
+     * Returns a JSON representation of the device
+     */
+    public Document toDoc() {
+        Document deviceDoc = new Document("deviceId", deviceId)
+                .append("deviceType", getType())
+                .append("deviceName", getName())
+                .append("deviceLocation", getLocation())
+                .append("deviceDescription", getDescription());
+        return deviceDoc;
+    }
 }
