@@ -23,8 +23,44 @@ public class DonorController {
      * check documentation for more info on inputs / outputs expected
      */
     @PostMapping("/api/donor/device/new")
-    public String donorDeviceNew() {
-        return "services";
+    public ResponseEntity<String> donorDeviceNew(
+            @RequestParam String authToken,
+            @RequestParam String deviceType,
+            @RequestParam String deviceName,
+            @RequestParam(required = false) String deviceLocation,
+            @RequestParam(required = false) String deviceDescription
+    ) {
+        DBDonor donor;
+        DeviceType type;
+        try {
+            donor = new DBDonor(DBUser.Id.AUTH_TOKEN, authToken);
+            type = DeviceType.valueOf(deviceType);
+        } catch (IllegalArgumentException e) {
+            return BAD_REQUEST(); // invalid device type
+        } catch (RuntimeException e) {
+            return UNAUTHORIZED(); // invalid auth token
+        }
+
+        if (deviceName.isEmpty() || deviceLocation.isEmpty())
+            return BAD_REQUEST("Required fields are missing");
+
+        String parsedLocation = null, parsedDescription = null;
+        if (deviceLocation != null) {
+            if (!Pattern.matches("[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}", deviceLocation))
+                return BAD_REQUEST("The postcode is invalid, try it in the format 'EC1A 1BB' instead.");
+            parsedLocation = deviceLocation;
+        }
+
+        if (deviceDescription != null && !deviceDescription.isEmpty())
+            parsedDescription = deviceDescription;
+
+        Device device = new Device(donor.getObjectId(ID), type, deviceName);
+        if (parsedDescription != null)
+            device.setDescription(parsedDescription);
+        if (parsedLocation != null)
+            device.setLocation(parsedLocation);
+
+        return OK(device.toDoc().toJson());
     }
 
     /**
@@ -35,9 +71,6 @@ public class DonorController {
     public ResponseEntity<String> donorListedDevices(
             @RequestParam String authToken
     ) {
-        // TODO temp solution with DBDonor, while user object are still in development
-        //  update to interact with account / donor object once implemented
-
         DBDonor donor;
         try {
             donor = new DBDonor(DBUser.Id.AUTH_TOKEN, authToken);
@@ -89,19 +122,18 @@ public class DonorController {
      */
     @PostMapping (value = "/api/donor/device/update")
     public ResponseEntity<String> donorDeviceUpdate(
-            @RequestParam(value = "authToken") String authToken,
-            @RequestParam(value = "deviceId") String deviceId,
-            @RequestParam(value = "deviceType", required = false) String deviceType,
-            @RequestParam(value = "deviceName", required = false) String deviceName,
-            @RequestParam(value = "deviceLocation", required = false) String deviceLocation,
-            @RequestParam(value = "deviceDescription", required = false) String deviceDescription
+            @RequestParam String authToken,
+            @RequestParam String deviceId,
+            @RequestParam(required = false) String deviceType,
+            @RequestParam(required = false) String deviceName,
+            @RequestParam(required = false) String deviceLocation,
+            @RequestParam(required = false) String deviceDescription
     ) {
         Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, true);
         if (device == null)
             return UNAUTHORIZED();
 
-        /* Validate the validity of all inputs prior to
-        ** writing anything to the database */
+        // Validate inputs first
         DeviceType safeType = null;
         String safeName = null, safeLocation = null, safeDescription = null;
         if (deviceType != null && !deviceType.isEmpty())

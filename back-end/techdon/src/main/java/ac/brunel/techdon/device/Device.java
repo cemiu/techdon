@@ -383,9 +383,13 @@ public class Device {
     public Document toDoc() {
         Document deviceDoc = new Document("deviceId", deviceId)
                 .append("deviceType", getType())
-                .append("deviceName", getName())
-                .append("deviceLocation", getLocation())
-                .append("deviceDescription", getDescription());
+                .append("deviceName", getName());
+
+        if (hasDescription())
+            deviceDoc.append("deviceDescription", getDescription());
+        if (hasLocation())
+            deviceDoc.append("deviceLocation", getLocation());
+
         return deviceDoc;
     }
 }
