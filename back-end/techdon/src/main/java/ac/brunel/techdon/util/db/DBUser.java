@@ -36,7 +36,10 @@ public class DBUser implements DBInstance {
         if (mode == Id.EMAIL)
             id = id.toLowerCase();
 
-        this.doc = db.getDocumentByField(mode.getAuthField(), id);
+        if (mode == Id.USER_ID)
+            this.doc = db.getDocumentByField(mode.getAuthField(), new ObjectId(id));
+        else
+            this.doc = db.getDocumentByField(mode.getAuthField(), id);
         if (this.doc == null)
             existsInDB = false;
     }

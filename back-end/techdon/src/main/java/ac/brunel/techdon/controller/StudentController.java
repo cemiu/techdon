@@ -7,16 +7,13 @@ import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBStudent;
 import ac.brunel.techdon.util.db.DBUser;
-import org.apache.logging.log4j.util.Strings;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotEmpty;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
@@ -59,7 +56,7 @@ public class StudentController {
 
         ObjectId studentId = student.getId();
         List<String> currentDevices = DevicePreference.getPreferredDevicesByStudent(studentId);
-        List<String> newDevices = new ArrayList(updatedDevices), removedDevices = new ArrayList<>(currentDevices);
+        List<String> newDevices = new ArrayList<>(updatedDevices), removedDevices = new ArrayList<>(currentDevices);
         newDevices.removeAll(currentDevices);
         removedDevices.removeAll(newDevices);
 
@@ -70,7 +67,7 @@ public class StudentController {
     }
 
     /**
-     * endpoint to set to all devices offered to a student
+     * endpoint to get to all devices offered to a student
      */
     @GetMapping (value = "/api/student/devices/offeredDevices")
     public ResponseEntity<String> studentDevicesOfferedDevices(
@@ -87,46 +84,39 @@ public class StudentController {
     }
 
     /**
-     * endpoint to set to all Load student Devices that is offered
-     * check documentation for more info on inputs / outputs expected
+     * endpoint for a student to load a specific device offered to them
      */
     @GetMapping ("/api/student/devices/load")
-    public ResponseEntity<String> studentDevicesLoad() {
-        return null;
-    }
-
-    /**
-     * endpoint to set to allow a student to claim
-     * check documentation for more info on inputs / outputs expected
-     */
-    @GetMapping("/api/student/devices/claim")
-    public ResponseEntity<String> studentDevicesClaim(
-            @RequestParam @NotEmpty String authToken,
-            @RequestParam @NotEmpty String deviceId
+    public ResponseEntity<String> studentDevicesLoad(
+            @RequestParam String authToken,
+            @RequestParam String deviceId
     ) {
         Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, false);
         if (device == null)
             return UNAUTHORIZED();
 
-        device.setClaimed();
-        // TODO why does the interface not accept object ids?
-        //  does this even work?
+        return OK(device.toDoc().toJson());
+    }
+
+    /**
+     * endpoint to set to allow a student to claim a device
+     */
+    @GetMapping("/api/student/devices/claim")
+    public ResponseEntity<String> studentDevicesClaim(
+            @RequestParam String authToken,
+            @RequestParam String deviceId
+    ) {
+        Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, false);
+        if (device == null)
+            return UNAUTHORIZED();
+
         DBDonor donor = new DBDonor(DBUser.Id.USER_ID, device.getDonorId().toString());
+        device.setClaimed();
 
-        // TODO let the donor limit which of these options
-        //  are seen, if time permits (at least first name + email)
-        String donName = donor.getString(FIRST_NAME) + " " + donor.getString(LAST_NAME);
-        String donEmail = donor.getString(EMAIL);
-        String donPhone = donor.getString(PHONE);
-        Object donAddress = donor.get(ADDRESS);
-
-        // TODO trigger dispense of email (to donor and student)
-
-        Document donorData = new Document("deviceId", deviceId)
-                .append("donorName", donName)
-                .append("donorEmail", donEmail)
-                .append("donorPhone", donPhone)
-                .append("donorAddress", donAddress);
+        Document donorData = device.toDoc()
+                .append("donorName", donor.getString(FIRST_NAME) + " " + donor.getString(LAST_NAME))
+                .append("donorEmail", donor.getString(EMAIL))
+                .append("donorPhone", donor.getString(PHONE));
 
         return OK(donorData.toJson());
     }
@@ -136,8 +126,20 @@ public class StudentController {
      * check documentation for more info on inputs / outputs expected
      */
     @PostMapping("/api/student/devices/decline")
-    public ResponseEntity<String> studentDevicesDecline() {
-        return null;
+    public ResponseEntity<String> studentDevicesDecline(
+            @RequestParam String authToken,
+            @RequestParam String deviceId
+    ) {
+        Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, false);
+        if (device == null)
+            return UNAUTHORIZED();
+
+        // sets the student to the back of the queue and remove the assignment
+        DBStudent student = new DBStudent(DBUser.Id.AUTH_TOKEN, authToken);
+        new DevicePreference(student.getId(), device.getType(), false).resetSelectionDate();
+        device.unassign();
+
+        return OK();
     }
 
 }
