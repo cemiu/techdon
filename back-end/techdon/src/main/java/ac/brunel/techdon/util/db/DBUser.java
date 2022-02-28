@@ -41,7 +41,7 @@ public class DBUser implements DBInstance {
             existsInDB = false;
     }
 
-    protected ObjectId getId() {
+    public ObjectId getId() {
         if (!existsInDB)
             return null;
         return getObjectId(ID);

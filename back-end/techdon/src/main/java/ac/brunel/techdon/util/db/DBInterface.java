@@ -52,6 +52,10 @@ public class DBInterface {
      * Uses a map of fields and their values to find a unique document
      */
     public Document getDocumentByFields(Map<String, Object> fields) {
+        return getDocumentsByFields(fields).first();
+    }
+
+    public FindIterable<Document> getDocumentsByFields(Map<String, Object> fields) {
         if (fields == null || fields.isEmpty() || fields.containsValue(null)
                 || fields.containsValue(""))
             throw new IllegalArgumentException("Cannot lookup DB Document in "
@@ -63,7 +67,7 @@ public class DBInterface {
             eqs[i] = eq(entry.getKey(), entry.getValue());
             i++;
         }
-        return collection.find(and(eqs)).first();
+        return collection.find(and(eqs));
     }
 
     /**

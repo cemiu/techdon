@@ -5,14 +5,12 @@ import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBUser;
-import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
 
 @RestController
@@ -41,8 +39,8 @@ public class DonorController {
             return UNAUTHORIZED(); // invalid auth token
         }
 
-        if (deviceName.isEmpty() || deviceLocation.isEmpty())
-            return BAD_REQUEST("Required fields are missing");
+        if (deviceName.isEmpty())
+            return BAD_REQUEST();
 
         String parsedLocation = null, parsedDescription = null;
         if (deviceLocation != null) {
@@ -54,7 +52,7 @@ public class DonorController {
         if (deviceDescription != null && !deviceDescription.isEmpty())
             parsedDescription = deviceDescription;
 
-        Device device = new Device(donor.getObjectId(ID), type, deviceName);
+        Device device = new Device(donor.getId(), type, deviceName);
         if (parsedDescription != null)
             device.setDescription(parsedDescription);
         if (parsedLocation != null)
@@ -78,9 +76,7 @@ public class DonorController {
             return UNAUTHORIZED(); // invalid donor auth token
         }
 
-        ObjectId donorId = donor.getObjectId(ID);
-        List<String> deviceIds = Device.getDevicesByDonor(donorId);
-
+        List<String> deviceIds = Device.getDevicesByDonor(donor.getId());
         return OK(deviceIds.toString());
     }
 

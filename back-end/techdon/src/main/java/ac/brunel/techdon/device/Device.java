@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public class Device {
 
@@ -344,7 +345,7 @@ public class Device {
     public static List<ObjectId> getDeviceIdsByDonor(ObjectId donorId) {
         if (donorId == null)
             return null;
-        return DBDevice.getDevicesByUser(donorId, true);
+        return DBDevice.getDevicesByUser(donorId, true, Optional.empty());
     }
     
     /**
@@ -363,14 +364,14 @@ public class Device {
      * a list of all device ids offered to or accepted by them
      */
     public static List<ObjectId> getDeviceIdsByStudent(ObjectId studentId) {
-        return DBDevice.getDevicesByUser(studentId, false);
+        return DBDevice.getDevicesByUser(studentId, false, Optional.empty());
     }
 
     /**
      * Returns a list of device ids belonging to a student
      * in string format
      */
-    public static List<String> getDevicesByStudent(ObjectId studentId) {
+    public static List<String> getDevicesByStudent(ObjectId studentId, Optional<Boolean> hasBeenClaimed) {
         List<String> list = new ArrayList<>();
         getDeviceIdsByStudent(studentId).stream().map(ObjectId::toString)
                 .forEach(list::add);

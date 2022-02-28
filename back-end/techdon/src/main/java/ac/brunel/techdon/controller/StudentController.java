@@ -1,5 +1,6 @@
 package ac.brunel.techdon.controller;
 
+import ac.brunel.techdon.controller.util.DeviceHelper;
 import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBStudent;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
@@ -43,10 +45,8 @@ public class StudentController {
      */
     @GetMapping (value = "/api/student/devices/offeredDevices", produces = "text/json")
     public ResponseEntity<String> studentDevicesOfferedDevices(
-            @RequestParam @NotEmpty String authToken
+            @RequestParam String authToken
     ) {
-        // TODO update with proper account interface once it's implemented
-
         DBStudent student;
         try {
             student = new DBStudent(DBUser.Id.AUTH_TOKEN, authToken);
@@ -54,12 +54,9 @@ public class StudentController {
             return UNAUTHORIZED(); // invalid student auth
         }
 
-        // returns device ids of student
-        ObjectId studentId = student.getObjectId(ID);
-        List<String> deviceIds = Device.getDevicesByStudent(studentId);
-        // TODO currently returns both offered and accepted device
-        //  maybe filter down to offered only, or send as tuple with
-        //  device state specified
+        ObjectId studentId = student.getId();
+        List<String> deviceIds = Device.getDevicesByStudent(studentId, Optional.of(false));
+
         return OK(deviceIds.toString());
     }
 
@@ -81,16 +78,9 @@ public class StudentController {
             @RequestParam @NotEmpty String authToken,
             @RequestParam @NotEmpty String deviceId
     ) {
-        // TODO rework once proper interface is implemented
-        DBStudent student;
-        Device device;
-        try {
-            student = new DBStudent(DBUser.Id.AUTH_TOKEN, authToken);
-            ObjectId studentId = student.getObjectId(ID);
-            device = new Device(deviceId, studentId, false);
-        } catch (RuntimeException e) {
+        Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, false);
+        if (device == null)
             return UNAUTHORIZED();
-        }
 
         device.setClaimed();
         // TODO why does the interface not accept object ids?

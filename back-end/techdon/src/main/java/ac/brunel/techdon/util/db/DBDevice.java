@@ -9,9 +9,13 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import static ac.brunel.techdon.util.db.fields.DBDeviceField.*;
+import static ac.brunel.techdon.util.db.fields.DBDevicePrefField.PREF_STUDENT_ID;
+import static ac.brunel.techdon.util.db.fields.DBDevicePrefField.PREF_TYPE;
 
 public class DBDevice  implements DBInstance {
 
@@ -130,11 +134,15 @@ public class DBDevice  implements DBInstance {
     /**
      * Gets all devices associated with specified
      * donor / student and returns a list containing
-     * their IDs
+     * their IDs, filtered by claimed status
      */
-    public static List<ObjectId> getDevicesByUser(ObjectId userId, boolean isDonor) {
+    public static List<ObjectId> getDevicesByUser(ObjectId userId, boolean isDonor, Optional<Boolean> hasBeenClaimed) {
         DBField field = isDonor ? DEVICE_DONOR : DEVICE_ASSIGNED_STUDENT;
-        FindIterable<Document> iterable = db.getDocumentsByField(field, userId);
+        HashMap<String, Object> query = new HashMap<>();
+        query.put(field.getKey(), userId);
+        hasBeenClaimed.ifPresent(isClaimed -> query.put(DEVICE_HAS_BEEN_CLAIMED.getKey(), isClaimed));
+
+        FindIterable<Document> iterable = db.getDocumentsByFields(query);
         List<ObjectId> list = new ArrayList<>();
 
         // transforms iterable of device docs into list of device ids
