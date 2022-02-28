@@ -315,27 +315,27 @@ paths:
         required: true
         schema:
           type: string
-      - name: productType
+      - name: deviceType
         in: query
-        description: Type of donated product (laptop / monitor / etc.)
+        description: Type of donated device (laptop / monitor / etc.)
         required: true
         schema:
           type: string
-      - name: productName
+      - name: deviceName
         in: query
-        description: Name of the product
+        description: Name of the device
         required: true
         schema:
           type: string
-      - name: productLocation
+      - name: deviceDescription
         in: query
-        description: Location of product (City or Postcode)
-        required: true
+        description: Optional description of the device
         schema:
           type: string
-      - name: productDescription
+      - name: deviceLocation
         in: query
-        description: Optional description of the product
+        description: Location of device (UK Postcode)
+        required: false
         schema:
           type: string
       responses:
@@ -665,11 +665,11 @@ components:
           example: 2026156@brunel.ac.uk
         phone:
           type: string
-          example: "07547878777"
+          example: 07547878777
         userType:
-          type: integer
+          type: string
+          example: student
           description: User Status
-          format: int32
         address:
           type: array
           description: 'Address feilds'
