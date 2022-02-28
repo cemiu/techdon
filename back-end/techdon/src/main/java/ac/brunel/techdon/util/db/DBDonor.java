@@ -83,4 +83,12 @@ public class DBDonor extends DBUser {
         return ownsDevice(device.getDeviceId());
     }
 
+    public static DBDonor loadDonor(Id idMode, String id) {
+        try {
+            return new DBDonor(idMode, id);
+        } catch (Exception e) {
+            return null; // no donor with matching criteria
+        }
+    }
+
 }

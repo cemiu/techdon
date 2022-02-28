@@ -19,15 +19,22 @@ public enum DeviceType {
     /**
      * Returns a device type given the type's descriptor string
      */
-    public static DeviceType typeFromString(String type) {
+    public static DeviceType typeFromStringSafe(String type) {
         return switch (type) {
             case "laptop" -> LAPTOP;
             case "desktopComputer" -> DESKTOP_COMPUTER;
             case "iPad" -> IPAD;
             case "monitor" -> MONITOR;
             case "hardDrive" -> HARD_DRIVE;
-            default -> throw new IllegalArgumentException(type + " is not a valid device type.");
+            default -> null;
         };
+    }
+
+    public static DeviceType typeFromString(String type) {
+        DeviceType deviceType = typeFromStringSafe(type);
+        if (deviceType == null)
+            throw new IllegalArgumentException(type + " is not a valid device type.");
+        return deviceType;
     }
 
     @Override

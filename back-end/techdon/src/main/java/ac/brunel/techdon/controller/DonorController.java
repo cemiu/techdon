@@ -28,19 +28,10 @@ public class DonorController {
             @RequestParam(required = false) String deviceLocation,
             @RequestParam(required = false) String deviceDescription
     ) {
-        DBDonor donor;
-        DeviceType type;
-        try {
-            donor = new DBDonor(DBUser.Id.AUTH_TOKEN, authToken);
-            type = DeviceType.valueOf(deviceType);
-        } catch (IllegalArgumentException e) {
-            return BAD_REQUEST(); // invalid device type
-        } catch (RuntimeException e) {
-            return UNAUTHORIZED(); // invalid auth token
-        }
-
-        if (deviceName.isEmpty())
-            return BAD_REQUEST();
+        DBDonor donor = DBDonor.loadDonor(DBUser.Id.AUTH_TOKEN, authToken);
+        DeviceType type = DeviceType.typeFromStringSafe(deviceType);
+        if (donor == null || type == null || deviceName.isEmpty())
+            return donor == null ? UNAUTHORIZED() : BAD_REQUEST();
 
         String parsedLocation = null, parsedDescription = null;
         if (deviceLocation != null) {
@@ -69,12 +60,9 @@ public class DonorController {
     public ResponseEntity<String> donorListedDevices(
             @RequestParam String authToken
     ) {
-        DBDonor donor;
-        try {
-            donor = new DBDonor(DBUser.Id.AUTH_TOKEN, authToken);
-        } catch (RuntimeException e) {
-            return UNAUTHORIZED(); // invalid donor auth token
-        }
+        DBDonor donor = DBDonor.loadDonor(DBUser.Id.AUTH_TOKEN, authToken);
+        if (donor == null)
+            return UNAUTHORIZED();
 
         List<String> deviceIds = Device.getDevicesByDonor(donor.getId());
         return OK(deviceIds.toString());
@@ -132,12 +120,11 @@ public class DonorController {
         // Validate inputs first
         DeviceType safeType = null;
         String safeName = null, safeLocation = null, safeDescription = null;
-        if (deviceType != null && !deviceType.isEmpty())
-            try {
-                safeType = DeviceType.typeFromString(deviceType); // unknown type
-            } catch (IllegalArgumentException e) {
-                return BAD_REQUEST("Unknown device type");
-            }
+        if (deviceType != null && !deviceType.isEmpty()) {
+            safeType = DeviceType.typeFromStringSafe(deviceType);
+            if (safeType == null)
+                return BAD_REQUEST("Invalid device type");
+        }
 
         if (deviceName != null && !deviceName.isEmpty()) {
             if (deviceName.length() > 300)
