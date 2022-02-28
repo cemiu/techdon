@@ -16,7 +16,7 @@ public class SecurityHelper {
 	 * and returns it as base64 encoded string
 	 */
 	public static String generateAuthKey() {
-		byte[] randomBytes = new byte[128];
+		byte[] randomBytes = new byte[32];
 	    secureRandom.nextBytes(randomBytes);
 	    return base64Encoder.encodeToString(randomBytes);
 	}
