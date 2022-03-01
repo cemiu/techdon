@@ -59,13 +59,6 @@ public class Preferences {
         return EMAIL_SETTINGS.getString("smtp_password");
     }
 
-    /**
-     * Empty method without return type used
-     * to load the preferences upon the launch
-     * of the app
-     */
-    public static void init() {}
-
     static {
         // creates template pref file, if none exists
         if (!PREF_FILE.exists()) {

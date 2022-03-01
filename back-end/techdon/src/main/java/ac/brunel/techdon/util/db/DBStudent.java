@@ -49,4 +49,12 @@ public class DBStudent extends DBUser {
         set(field.getKey(), value);
     }
 
+    public static DBStudent loadStudent(Id idMode, String id) {
+        try {
+            return new DBStudent(idMode, id);
+        } catch (Exception e) {
+            return null; // no student with matching criteria
+        }
+    }
+
 }

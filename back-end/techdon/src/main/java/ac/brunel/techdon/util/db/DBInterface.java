@@ -52,6 +52,10 @@ public class DBInterface {
      * Uses a map of fields and their values to find a unique document
      */
     public Document getDocumentByFields(Map<String, Object> fields) {
+        return getDocumentsByFields(fields).first();
+    }
+
+    public FindIterable<Document> getDocumentsByFields(Map<String, Object> fields) {
         if (fields == null || fields.isEmpty() || fields.containsValue(null)
                 || fields.containsValue(""))
             throw new IllegalArgumentException("Cannot lookup DB Document in "
@@ -63,7 +67,7 @@ public class DBInterface {
             eqs[i] = eq(entry.getKey(), entry.getValue());
             i++;
         }
-        return collection.find(and(eqs)).first();
+        return collection.find(and(eqs));
     }
 
     /**
@@ -113,34 +117,11 @@ public class DBInterface {
     }
 
     /**
-     * Method for constructing & sending basic DB queries
-     * action: set (set field), inc (increment number), push (append to list)
-     * id: _id of user being updated
-     * field: name of field being updated
-     * value: value field is being set to / incremented by / appended
-     */
-    private void query(String action, ObjectId id, String field, Object value) {
-        Document query = new Document("$"+action , new Document(field, value));
-        collection.updateOne(eq("_id", id), query);
-    }
-
-    /**
      * Inserts a new document without _id into the collection
      */
     public void insertNew(Document doc) {
         collection.insertOne(doc);
     }
-
-    public boolean documentExists(String field, String value) {
-        return getDocumentByField(field, value) != null;
-    }
-
-    /**
-     * Empty method without return type used
-     * to initialize the connection to the database
-     * upon the launch of the app
-     */
-    public static void init() {}
 
     static {
         client = DBPreferences.getClient();

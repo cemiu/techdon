@@ -1,6 +1,9 @@
 package ac.brunel.techdon.controller;
 
+import ac.brunel.techdon.controller.util.DeviceHelper;
 import ac.brunel.techdon.device.Device;
+import ac.brunel.techdon.device.DevicePreference;
+import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBStudent;
 import ac.brunel.techdon.util.db.DBUser;
@@ -9,9 +12,8 @@ import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.constraints.NotEmpty;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
@@ -20,97 +22,101 @@ import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 public class StudentController {
 
     /**
-     * endpoint to register an account
-     * check documentation for more info on inputs / outputs expected
+     * endpoint to load device preferences for a student
      */
     @GetMapping("/api/student/devices/loadPreferences")
-    public String studentDevicesLoadPreferences() {
-        return null;
+    public ResponseEntity<String> studentDevicesLoadPreferences(
+            @RequestParam String authToken
+    ) {
+        DBStudent student = DBStudent.loadStudent(DBUser.Id.AUTH_TOKEN, authToken);
+        if (student == null)
+            return UNAUTHORIZED();
+
+        ObjectId studentId = student.getId();
+        List<String> deviceTypes = DevicePreference.getPreferredDevicesByStudent(studentId);
+
+        return OK(deviceTypes.toString());
     }
 
     /**
      * endpoint to set preferences for which devices the students wants
-     * check documentation for more info on inputs / outputs expected
      */
-    @PostMapping("/api/student/devices/setPreferences")
-    public String studentDevicesSetPreferences() {
-        return null;
+//    @PostMapping("/api/student/devices/setPreferences")
+    @GetMapping("/api/student/devices/setPreferences")
+    public ResponseEntity<String> studentDevicesSetPreferences(
+            @RequestParam String authToken,
+            @RequestParam(name = "deviceTypes") List<String> updatedDevices
+    ) {
+        DBStudent student = DBStudent.loadStudent(DBUser.Id.AUTH_TOKEN, authToken);
+        if (student == null)
+            return UNAUTHORIZED();
+
+        if (updatedDevices.stream().anyMatch(type -> DeviceType.typeFromStringSafe(type) == null))
+            return BAD_REQUEST("Invalid device type");
+
+        ObjectId studentId = student.getId();
+        List<String> currentDevices = DevicePreference.getPreferredDevicesByStudent(studentId);
+        List<String> newDevices = new ArrayList<>(updatedDevices), removedDevices = new ArrayList<>(currentDevices);
+        newDevices.removeAll(currentDevices);
+        removedDevices.removeAll(updatedDevices);
+
+        newDevices.forEach(type -> new DevicePreference(studentId, DeviceType.typeFromString(type), true));
+        removedDevices.forEach(type -> new DevicePreference(studentId, DeviceType.typeFromString(type), false).removePreference());
+
+        return OK();
     }
 
     /**
-     * endpoint to set to all devices offered to a student
-     * check documentation for more info on inputs / outputs expected
+     * endpoint to get to all devices offered to a student
      */
-    @GetMapping (value = "/api/student/devices/offeredDevices", produces = "text/json")
+    @GetMapping (value = "/api/student/devices/offeredDevices")
     public ResponseEntity<String> studentDevicesOfferedDevices(
-            @RequestParam @NotEmpty String authToken
+            @RequestParam String authToken
     ) {
-        // TODO update with proper account interface once it's implemented
+        DBStudent student = DBStudent.loadStudent(DBUser.Id.AUTH_TOKEN, authToken);
+        if (student == null)
+            return UNAUTHORIZED();
 
-        DBStudent student;
-        try {
-            student = new DBStudent(DBUser.Id.AUTH_TOKEN, authToken);
-        } catch (NoSuchElementException e) {
-            return UNAUTHORIZED(); // invalid student auth
-        }
+        ObjectId studentId = student.getId();
+        List<String> deviceIds = Device.getDevicesByStudent(studentId, false);
 
-        // returns device ids of student
-        ObjectId studentId = student.getObjectId(ID);
-        List<String> deviceIds = Device.getDevicesByStudent(studentId);
-        // TODO currently returns both offered and accepted device
-        //  maybe filter down to offered only, or send as tuple with
-        //  device state specified
         return OK(deviceIds.toString());
     }
 
     /**
-     * endpoint to set to all Load student Devices that is offered
-     * check documentation for more info on inputs / outputs expected
+     * endpoint for a student to load a specific device offered to them
      */
     @GetMapping ("/api/student/devices/load")
-    public String studentDevicesLoad() {
-        return null;
+    public ResponseEntity<String> studentDevicesLoad(
+            @RequestParam String authToken,
+            @RequestParam String deviceId
+    ) {
+        Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, false);
+        if (device == null)
+            return UNAUTHORIZED();
+
+        return OK(device.toDoc().toJson());
     }
 
     /**
-     * endpoint to set to allow a student to claim
-     * check documentation for more info on inputs / outputs expected
+     * endpoint to set to allow a student to claim a device
      */
     @GetMapping("/api/student/devices/claim")
     public ResponseEntity<String> studentDevicesClaim(
-            @RequestParam @NotEmpty String authToken,
-            @RequestParam @NotEmpty String deviceId
+            @RequestParam String authToken,
+            @RequestParam String deviceId
     ) {
-        // TODO rework once proper interface is implemented
-        DBStudent student;
-        Device device;
-        try {
-            student = new DBStudent(DBUser.Id.AUTH_TOKEN, authToken);
-            ObjectId studentId = student.getObjectId(ID);
-            device = new Device(deviceId, studentId, false);
-        } catch (RuntimeException e) {
+        Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, false);
+        if (device == null)
             return UNAUTHORIZED();
-        }
 
-        device.setClaimed();
-        // TODO why does the interface not accept object ids?
-        //  does this even work?
         DBDonor donor = new DBDonor(DBUser.Id.USER_ID, device.getDonorId().toString());
+        device.setClaimed();
 
-        // TODO let the donor limit which of these options
-        //  are seen, if time permits (at least first name + email)
-        String donName = donor.getString(FIRST_NAME) + " " + donor.getString(LAST_NAME);
-        String donEmail = donor.getString(EMAIL);
-        String donPhone = donor.getString(PHONE);
-        Object donAddress = donor.get(ADDRESS);
-
-        // TODO trigger dispense of email (to donor and student)
-
-        Document donorData = new Document("deviceId", deviceId)
-                .append("donorName", donName)
-                .append("donorEmail", donEmail)
-                .append("donorPhone", donPhone)
-                .append("donorAddress", donAddress);
+        Document donorData = device.toDoc()
+                .append("donorName", donor.getString(FIRST_NAME) + " " + donor.getString(LAST_NAME))
+                .append("donorEmail", donor.getString(EMAIL))
+                .append("donorPhone", donor.getString(PHONE));
 
         return OK(donorData.toJson());
     }
@@ -119,11 +125,22 @@ public class StudentController {
      * endpoint to decline an offered device
      * check documentation for more info on inputs / outputs expected
      */
-    @PostMapping("/api/student/devices/decline")
-    public ResponseEntity<String> studentDevicesDecline() {
-        return null;
+//    @PostMapping("/api/student/devices/decline")
+    @GetMapping("/api/student/devices/decline")
+    public ResponseEntity<String> studentDevicesDecline(
+            @RequestParam String authToken,
+            @RequestParam String deviceId
+    ) {
+        Device device = DeviceHelper.getDeviceByAuth(authToken, deviceId, false);
+        if (device == null)
+            return UNAUTHORIZED();
+
+        // sets the student to the back of the queue and remove the assignment
+        DBStudent student = new DBStudent(DBUser.Id.AUTH_TOKEN, authToken);
+        new DevicePreference(student.getId(), device.getType(), false).resetSelectionDate();
+        device.unassign();
+
+        return OK();
     }
 
 }
-    
-

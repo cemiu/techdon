@@ -34,10 +34,6 @@ public class DBDevicePref implements DBInstance {
         doc.put("_id", new ObjectId());
     }
 
-    public DBDevicePref(String prefId) {
-        this(new ObjectId(prefId));
-    }
-
     /**
      * Loads a preference from the database. Call {@link #doesExistInDB()}
      * after loading to make sure that the device loaded correctly
@@ -99,16 +95,6 @@ public class DBDevicePref implements DBInstance {
                     "It is generated automatically and immutable.");
 
         set(field.getKey(), value);
-    }
-
-    /**
-     * Removes the specified field from the remote object
-     */
-    public void remove(DBDevicePrefField field) {
-        doc.remove(field.getKey());
-
-        if (writeMode == DBWriteMode.AUTOMATIC)
-            write();
     }
 
     /**

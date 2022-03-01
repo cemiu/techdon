@@ -1,11 +1,7 @@
 package ac.brunel.techdon.controller.util;
 
 import ac.brunel.techdon.device.Device;
-import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBUser;
-import org.bson.types.ObjectId;
-
-import static ac.brunel.techdon.util.db.fields.DBUserField.ID;
 
 public class DeviceHelper {
 
@@ -18,8 +14,7 @@ public class DeviceHelper {
         Device device;
         try {
             user = new DBUser(DBUser.Id.AUTH_TOKEN, authToken); // invalid auth
-            ObjectId donorId = user.getObjectId(ID);
-            device = new Device(deviceId, donorId, isDonor); // invalid device
+            device = new Device(deviceId, user.getId(), isDonor); // invalid device
         } catch (RuntimeException e) {
             return null;
         }

@@ -36,12 +36,15 @@ public class DBUser implements DBInstance {
         if (mode == Id.EMAIL)
             id = id.toLowerCase();
 
-        this.doc = db.getDocumentByField(mode.getAuthField(), id);
+        if (mode == Id.USER_ID)
+            this.doc = db.getDocumentByField(mode.getAuthField(), new ObjectId(id));
+        else
+            this.doc = db.getDocumentByField(mode.getAuthField(), id);
         if (this.doc == null)
             existsInDB = false;
     }
 
-    protected ObjectId getId() {
+    public ObjectId getId() {
         if (!existsInDB)
             return null;
         return getObjectId(ID);
@@ -122,11 +125,11 @@ public class DBUser implements DBInstance {
         db.delete(doc);
         doc = null;
     }
-    
+
     /**
-     * Deletes user from the the database
+     * Deletes user from the database
      */
-    // TODO: Consult with database developer
+    // TODO: remove this method
     public void deleteUserAccount()  {
     	if (!existsInDB)
             throw new IllegalArgumentException("Cannot delete a user that is not in the database.");

@@ -5,24 +5,25 @@ import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBUser;
-import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
 
 @RestController
 public class DonorController {
 
+    private static final Pattern POST_CODE_PATTERN = Pattern.compile("^[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}$");
+
     /**
      * endpoint to donate a new device
      * check documentation for more info on inputs / outputs expected
      */
-    @PostMapping("/api/donor/device/new")
+//    @PostMapping("/api/donor/device/new")
+    @GetMapping("/api/donor/device/new")
     public ResponseEntity<String> donorDeviceNew(
             @RequestParam String authToken,
             @RequestParam String deviceType,
@@ -30,23 +31,14 @@ public class DonorController {
             @RequestParam(required = false) String deviceLocation,
             @RequestParam(required = false) String deviceDescription
     ) {
-        DBDonor donor;
-        DeviceType type;
-        try {
-            donor = new DBDonor(DBUser.Id.AUTH_TOKEN, authToken);
-            type = DeviceType.valueOf(deviceType);
-        } catch (IllegalArgumentException e) {
-            return BAD_REQUEST(); // invalid device type
-        } catch (RuntimeException e) {
-            return UNAUTHORIZED(); // invalid auth token
-        }
-
-        if (deviceName.isEmpty() || deviceLocation.isEmpty())
-            return BAD_REQUEST("Required fields are missing");
+        DBDonor donor = DBDonor.loadDonor(DBUser.Id.AUTH_TOKEN, authToken);
+        DeviceType type = DeviceType.typeFromStringSafe(deviceType);
+        if (donor == null || type == null || deviceName.isEmpty())
+            return donor == null ? UNAUTHORIZED() : BAD_REQUEST();
 
         String parsedLocation = null, parsedDescription = null;
         if (deviceLocation != null) {
-            if (!Pattern.matches("[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}", deviceLocation))
+            if (!POST_CODE_PATTERN.matcher(deviceLocation).matches())
                 return BAD_REQUEST("The postcode is invalid, try it in the format 'EC1A 1BB' instead.");
             parsedLocation = deviceLocation;
         }
@@ -54,7 +46,7 @@ public class DonorController {
         if (deviceDescription != null && !deviceDescription.isEmpty())
             parsedDescription = deviceDescription;
 
-        Device device = new Device(donor.getObjectId(ID), type, deviceName);
+        Device device = new Device(donor.getId(), type, deviceName);
         if (parsedDescription != null)
             device.setDescription(parsedDescription);
         if (parsedLocation != null)
@@ -71,16 +63,11 @@ public class DonorController {
     public ResponseEntity<String> donorListedDevices(
             @RequestParam String authToken
     ) {
-        DBDonor donor;
-        try {
-            donor = new DBDonor(DBUser.Id.AUTH_TOKEN, authToken);
-        } catch (RuntimeException e) {
-            return UNAUTHORIZED(); // invalid donor auth token
-        }
+        DBDonor donor = DBDonor.loadDonor(DBUser.Id.AUTH_TOKEN, authToken);
+        if (donor == null)
+            return UNAUTHORIZED();
 
-        ObjectId donorId = donor.getObjectId(ID);
-        List<String> deviceIds = Device.getDevicesByDonor(donorId);
-
+        List<String> deviceIds = Device.getDevicesByDonor(donor.getId());
         return OK(deviceIds.toString());
     }
 
@@ -103,7 +90,8 @@ public class DonorController {
      * endpoint to remove a device which has been listed for donation
      * check documentation for more info on inputs / outputs expected
      */
-    @DeleteMapping (value = "/api/donor/device/remove")
+    //@DeleteMapping (value = "/api/donor/device/remove")
+    @GetMapping (value = "/api/donor/device/remove")
     public ResponseEntity<String> donorDeviceRemove(
             @RequestParam String authToken,
             @RequestParam String deviceId
@@ -120,7 +108,8 @@ public class DonorController {
      * endpoint to change values of a device listed for donation
      * check documentation for more info on inputs / outputs expected
      */
-    @PostMapping (value = "/api/donor/device/update")
+    @GetMapping (value = "/api/donor/device/update")
+//    @PostMapping (value = "/api/donor/device/update")
     public ResponseEntity<String> donorDeviceUpdate(
             @RequestParam String authToken,
             @RequestParam String deviceId,
@@ -136,12 +125,11 @@ public class DonorController {
         // Validate inputs first
         DeviceType safeType = null;
         String safeName = null, safeLocation = null, safeDescription = null;
-        if (deviceType != null && !deviceType.isEmpty())
-            try {
-                safeType = DeviceType.typeFromString(deviceType); // unknown type
-            } catch (IllegalArgumentException e) {
-                return BAD_REQUEST("Unknown device type");
-            }
+        if (deviceType != null && !deviceType.isEmpty()) {
+            safeType = DeviceType.typeFromStringSafe(deviceType);
+            if (safeType == null)
+                return BAD_REQUEST("Invalid device type");
+        }
 
         if (deviceName != null && !deviceName.isEmpty()) {
             if (deviceName.length() > 300)
@@ -149,10 +137,8 @@ public class DonorController {
             safeName = deviceName;
         }
 
-        if (deviceLocation != null && !deviceLocation.isEmpty()) {
-            Pattern pattern = Pattern.compile("[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}");
-            boolean isValid = pattern.matcher(deviceLocation).matches();
-            if (!isValid)
+        if (deviceLocation != null) {
+            if (!deviceLocation.equals("") && !POST_CODE_PATTERN.matcher(deviceLocation).matches())
                 return BAD_REQUEST("The postcode \"" + deviceLocation + "\" is invalid, try it in the format \"EC1A 1BB\" instead.");
             safeLocation = deviceLocation;
         }
@@ -174,7 +160,10 @@ public class DonorController {
             else
                 device.setDescription(safeDescription);
         if (safeLocation != null)
-            device.setLocation(safeLocation);
+            if (safeLocation.equals(""))
+                device.removeLocation();
+            else
+                device.setLocation(safeLocation);
 
         return OK();
     }
