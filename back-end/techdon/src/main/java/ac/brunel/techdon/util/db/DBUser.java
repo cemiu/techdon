@@ -125,11 +125,11 @@ public class DBUser implements DBInstance {
         db.delete(doc);
         doc = null;
     }
-    
+
     /**
-     * Deletes user from the the database
+     * Deletes user from the database
      */
-    // TODO: Consult with database developer
+    // TODO: remove this method
     public void deleteUserAccount()  {
     	if (!existsInDB)
             throw new IllegalArgumentException("Cannot delete a user that is not in the database.");

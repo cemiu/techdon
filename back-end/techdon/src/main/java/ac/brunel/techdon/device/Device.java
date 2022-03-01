@@ -12,26 +12,24 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 public class Device {
 
     DBDevice dbDevice;
 
-    // TODO add photo support later
-    private ObjectId deviceId;
+    @lombok.Getter private ObjectId deviceId;
 
-    private ObjectId donorId;
-    private DeviceType type;
-    private String name;
+    @lombok.Getter private ObjectId donorId;
+    @lombok.Getter private DeviceType type;
+    @lombok.Getter private String name;
     private long listingDate;
 
     // optional
-    private String location; // only needed for in-person collection
-    private String description;
-    private ObjectId assignedStudent;
+    @lombok.Getter private String location; // only needed for in-person collection
+    @lombok.Getter private String description;
+    @lombok.Getter private ObjectId assignedStudent;
     private Long assignedDate;
-    private boolean hasBeenClaimed;
+    @lombok.Getter private boolean hasBeenClaimed;
 
     @SuppressWarnings("unused")
     private Device() {}
@@ -123,35 +121,6 @@ public class Device {
     }
 
     /**
-     * Returns the object id of the device
-     */
-    public ObjectId getDeviceId() {
-        return deviceId;
-    }
-
-    /**
-     * Returns the donor user's object id
-     */
-    @SuppressWarnings("unused")
-    public ObjectId getDonorId() {
-        return donorId;
-    }
-
-    /**
-     * Returns the type of the device
-     */
-    public DeviceType getType() {
-        return type;
-    }
-
-    /**
-     * Returns the descriptive name of a device
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
      * Returns whether the device has a location
      * for in-person collection
      */
@@ -160,27 +129,10 @@ public class Device {
     }
 
     /**
-     * Returns the device's location.
-     * Returns null if no location is set
-     */
-    public String getLocation() {
-        return location;
-    }
-
-    /**
      * Returns whether the device has been given a description
      */
-    @SuppressWarnings("unused")
     public boolean hasDescription() {
         return description != null;
-    }
-
-    /**
-     * Returns the device's description.
-     * Returns null if no description has been set
-     */
-    public String getDescription() {
-        return description;
     }
 
     /**
@@ -192,15 +144,6 @@ public class Device {
     }
 
     /**
-     * Returns assigned student's object id
-     * If the device is not assigned, returns null
-     */
-    @SuppressWarnings("unused")
-    public ObjectId getAssignedStudent() {
-        return assignedStudent;
-    }
-
-    /**
      * Returns the date on which the device
      * was offered to a student. If the device
      * hasn't been offered, it returns -1
@@ -209,15 +152,6 @@ public class Device {
         if (assignedDate == null)
             return -1;
         return assignedDate;
-    }
-
-    /**
-     * Returns whether the device has been claimed by a
-     * student. If no student is assigned, returns false
-     */
-    @SuppressWarnings("unused")
-    public boolean hasBeenClaimed() {
-        return hasBeenClaimed;
     }
 
     /**
@@ -274,32 +208,24 @@ public class Device {
         this.assignedDate = Instant.now().getEpochSecond();
         this.hasBeenClaimed = false;
 
-        // TODO for multiple sequential writes, maybe set write mode to manual temporarily ?
+        dbDevice.setWriteMode(DBWriteMode.MANUAL);
         dbDevice.set(DEVICE_ASSIGNED_STUDENT, assignedStudent);
         dbDevice.set(DEVICE_ASSIGNED_DATE, assignedDate);
         dbDevice.set(DEVICE_HAS_BEEN_CLAIMED, hasBeenClaimed);
+        dbDevice.setWriteMode(DBWriteMode.AUTOMATIC);
     }
 
     /**
      * Sets a device's status as claimed,
      * expects that it has been assigned to student
      */
-    @SuppressWarnings("unused")
     public void setClaimed() {
-        setClaimed(true);
-    }
-
-    /**
-     * Sets the device as either claimed or unclaimed
-     */
-    @SuppressWarnings("unused")
-    private void setClaimed(boolean status) {
         if (assignedStudent == null)
-            throw new IllegalArgumentException("Cannot (un)claim device that is not" +
+            throw new IllegalArgumentException("Cannot claim a device that is not" +
                     "assigned to a student. For device: " + deviceId);
 
-        hasBeenClaimed = status;
-        dbDevice.set(DEVICE_HAS_BEEN_CLAIMED, hasBeenClaimed);
+        hasBeenClaimed = true;
+        dbDevice.set(DEVICE_HAS_BEEN_CLAIMED, true);
     }
 
     /**
@@ -345,7 +271,7 @@ public class Device {
     public static List<ObjectId> getDeviceIdsByDonor(ObjectId donorId) {
         if (donorId == null)
             return null;
-        return DBDevice.getDevicesByUser(donorId, true, Optional.empty());
+        return DBDevice.getDevicesByUser(donorId, true, null);
     }
     
     /**
@@ -363,17 +289,17 @@ public class Device {
      * Method that takes in a student's object id and returns
      * a list of all device ids offered to or accepted by them
      */
-    public static List<ObjectId> getDeviceIdsByStudent(ObjectId studentId) {
-        return DBDevice.getDevicesByUser(studentId, false, Optional.empty());
+    public static List<ObjectId> getDeviceIdsByStudent(ObjectId studentId, Boolean hasBeenClaimed) {
+        return DBDevice.getDevicesByUser(studentId, false, hasBeenClaimed);
     }
 
     /**
      * Returns a list of device ids belonging to a student
      * in string format
      */
-    public static List<String> getDevicesByStudent(ObjectId studentId, Optional<Boolean> hasBeenClaimed) {
+    public static List<String> getDevicesByStudent(ObjectId studentId, Boolean hasBeenClaimed) {
         List<String> list = new ArrayList<>();
-        getDeviceIdsByStudent(studentId).stream().map(ObjectId::toString)
+        getDeviceIdsByStudent(studentId, hasBeenClaimed).stream().map(ObjectId::toString)
                 .forEach(list::add);
         return list;
     }
@@ -383,7 +309,7 @@ public class Device {
      */
     public Document toDoc() {
         Document deviceDoc = new Document("deviceId", deviceId)
-                .append("deviceType", getType())
+                .append("deviceType", getType().toString())
                 .append("deviceName", getName());
 
         if (hasDescription())

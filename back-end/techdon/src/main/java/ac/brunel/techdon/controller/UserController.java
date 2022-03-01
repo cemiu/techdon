@@ -31,7 +31,6 @@ public class UserController {
 	/**
 	 * endpoint to register a student account
 	 */
-	@GetMapping("/api/user/register")
 	public String donorRegister(Donor donor) {
 		
 		String auth = SecurityHelper.generateAuthKey();

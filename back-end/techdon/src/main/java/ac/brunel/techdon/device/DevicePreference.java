@@ -19,8 +19,8 @@ public class DevicePreference {
 
     DBDevicePref dbPref;
 
-    private ObjectId studentId;
-    private DeviceType deviceType;
+    @lombok.Getter private ObjectId studentId;
+    @lombok.Getter private DeviceType deviceType;
     private long selectionDate;
     private boolean isPrefInQueue;
 
@@ -77,7 +77,6 @@ public class DevicePreference {
         this.deviceType = DeviceType.typeFromString(dbPref.getString(PREF_TYPE));
         this.selectionDate = dbPref.getLong(PREF_DATE);
         this.isPrefInQueue = dbPref.getBoolean(PREF_IS_IN_QUEUE);
-        return;
     }
 
     /**
@@ -104,14 +103,6 @@ public class DevicePreference {
      */
     public void removePreference() {
         dbPref.delete();
-    }
-
-    public ObjectId getStudentId() {
-        return studentId;
-    }
-
-    public DeviceType getDeviceType() {
-        return deviceType;
     }
 
     /**

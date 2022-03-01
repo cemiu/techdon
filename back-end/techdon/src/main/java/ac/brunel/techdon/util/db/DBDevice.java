@@ -11,11 +11,8 @@ import org.bson.types.ObjectId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
 
 import static ac.brunel.techdon.util.db.fields.DBDeviceField.*;
-import static ac.brunel.techdon.util.db.fields.DBDevicePrefField.PREF_STUDENT_ID;
-import static ac.brunel.techdon.util.db.fields.DBDevicePrefField.PREF_TYPE;
 
 public class DBDevice  implements DBInstance {
 
@@ -30,10 +27,6 @@ public class DBDevice  implements DBInstance {
         existsInDB = false;
         doc = new Document();
         doc.put("_id", new ObjectId());
-    }
-
-    public DBDevice(String deviceId) {
-        this(new ObjectId(deviceId));
     }
 
     /**
@@ -136,11 +129,12 @@ public class DBDevice  implements DBInstance {
      * donor / student and returns a list containing
      * their IDs, filtered by claimed status
      */
-    public static List<ObjectId> getDevicesByUser(ObjectId userId, boolean isDonor, Optional<Boolean> hasBeenClaimed) {
+    public static List<ObjectId> getDevicesByUser(ObjectId userId, boolean isDonor, Boolean hasBeenClaimed) {
         DBField field = isDonor ? DEVICE_DONOR : DEVICE_ASSIGNED_STUDENT;
         HashMap<String, Object> query = new HashMap<>();
         query.put(field.getKey(), userId);
-        hasBeenClaimed.ifPresent(isClaimed -> query.put(DEVICE_HAS_BEEN_CLAIMED.getKey(), isClaimed));
+        if (hasBeenClaimed != null)
+            query.put(DEVICE_HAS_BEEN_CLAIMED.getKey(), hasBeenClaimed);
 
         FindIterable<Document> iterable = db.getDocumentsByFields(query);
         List<ObjectId> list = new ArrayList<>();

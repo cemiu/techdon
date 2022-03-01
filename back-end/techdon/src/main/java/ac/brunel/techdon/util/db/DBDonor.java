@@ -71,18 +71,6 @@ public class DBDonor extends DBUser {
         return false;
     }
 
-    /**
-     * Takes in a device and returns whether it is owned by
-     * the current user. Note: the device does not have to be
-     * a complete match, just the IDs have to match
-     */
-    public boolean ownsDevice(Device device) {
-        if (device == null)
-            return false;
-
-        return ownsDevice(device.getDeviceId());
-    }
-
     public static DBDonor loadDonor(Id idMode, String id) {
         try {
             return new DBDonor(idMode, id);

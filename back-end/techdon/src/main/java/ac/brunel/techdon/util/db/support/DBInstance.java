@@ -74,7 +74,7 @@ public interface DBInstance {
     }
 
     default <T> List<T> getList(String key, Class<T> t) {
-        List<T> list = get(key, List.class);
+        List list = get(key, List.class);
         return list != null ? list : new ArrayList<>();
     }
 

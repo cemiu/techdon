@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
@@ -42,7 +41,8 @@ public class StudentController {
     /**
      * endpoint to set preferences for which devices the students wants
      */
-    @PostMapping("/api/student/devices/setPreferences")
+//    @PostMapping("/api/student/devices/setPreferences")
+    @GetMapping("/api/student/devices/setPreferences")
     public ResponseEntity<String> studentDevicesSetPreferences(
             @RequestParam String authToken,
             @RequestParam(name = "deviceTypes") List<String> updatedDevices
@@ -58,7 +58,7 @@ public class StudentController {
         List<String> currentDevices = DevicePreference.getPreferredDevicesByStudent(studentId);
         List<String> newDevices = new ArrayList<>(updatedDevices), removedDevices = new ArrayList<>(currentDevices);
         newDevices.removeAll(currentDevices);
-        removedDevices.removeAll(newDevices);
+        removedDevices.removeAll(updatedDevices);
 
         newDevices.forEach(type -> new DevicePreference(studentId, DeviceType.typeFromString(type), true));
         removedDevices.forEach(type -> new DevicePreference(studentId, DeviceType.typeFromString(type), false).removePreference());
@@ -78,7 +78,7 @@ public class StudentController {
             return UNAUTHORIZED();
 
         ObjectId studentId = student.getId();
-        List<String> deviceIds = Device.getDevicesByStudent(studentId, Optional.of(false));
+        List<String> deviceIds = Device.getDevicesByStudent(studentId, false);
 
         return OK(deviceIds.toString());
     }
@@ -125,7 +125,8 @@ public class StudentController {
      * endpoint to decline an offered device
      * check documentation for more info on inputs / outputs expected
      */
-    @PostMapping("/api/student/devices/decline")
+//    @PostMapping("/api/student/devices/decline")
+    @GetMapping("/api/student/devices/decline")
     public ResponseEntity<String> studentDevicesDecline(
             @RequestParam String authToken,
             @RequestParam String deviceId
@@ -143,5 +144,3 @@ public class StudentController {
     }
 
 }
-    
-

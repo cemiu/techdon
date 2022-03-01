@@ -16,11 +16,14 @@ import static ac.brunel.techdon.controller.util.ResponseHelper.*;
 @RestController
 public class DonorController {
 
+    private static final Pattern POST_CODE_PATTERN = Pattern.compile("^[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}$");
+
     /**
      * endpoint to donate a new device
      * check documentation for more info on inputs / outputs expected
      */
-    @PostMapping("/api/donor/device/new")
+//    @PostMapping("/api/donor/device/new")
+    @GetMapping("/api/donor/device/new")
     public ResponseEntity<String> donorDeviceNew(
             @RequestParam String authToken,
             @RequestParam String deviceType,
@@ -35,7 +38,7 @@ public class DonorController {
 
         String parsedLocation = null, parsedDescription = null;
         if (deviceLocation != null) {
-            if (!Pattern.matches("[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}", deviceLocation))
+            if (!POST_CODE_PATTERN.matcher(deviceLocation).matches())
                 return BAD_REQUEST("The postcode is invalid, try it in the format 'EC1A 1BB' instead.");
             parsedLocation = deviceLocation;
         }
@@ -87,7 +90,8 @@ public class DonorController {
      * endpoint to remove a device which has been listed for donation
      * check documentation for more info on inputs / outputs expected
      */
-    @DeleteMapping (value = "/api/donor/device/remove")
+    //@DeleteMapping (value = "/api/donor/device/remove")
+    @GetMapping (value = "/api/donor/device/remove")
     public ResponseEntity<String> donorDeviceRemove(
             @RequestParam String authToken,
             @RequestParam String deviceId
@@ -104,7 +108,8 @@ public class DonorController {
      * endpoint to change values of a device listed for donation
      * check documentation for more info on inputs / outputs expected
      */
-    @PostMapping (value = "/api/donor/device/update")
+    @GetMapping (value = "/api/donor/device/update")
+//    @PostMapping (value = "/api/donor/device/update")
     public ResponseEntity<String> donorDeviceUpdate(
             @RequestParam String authToken,
             @RequestParam String deviceId,
@@ -132,10 +137,8 @@ public class DonorController {
             safeName = deviceName;
         }
 
-        if (deviceLocation != null && !deviceLocation.isEmpty()) {
-            Pattern pattern = Pattern.compile("[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}");
-            boolean isValid = pattern.matcher(deviceLocation).matches();
-            if (!isValid)
+        if (deviceLocation != null) {
+            if (!deviceLocation.equals("") && !POST_CODE_PATTERN.matcher(deviceLocation).matches())
                 return BAD_REQUEST("The postcode \"" + deviceLocation + "\" is invalid, try it in the format \"EC1A 1BB\" instead.");
             safeLocation = deviceLocation;
         }
@@ -157,7 +160,10 @@ public class DonorController {
             else
                 device.setDescription(safeDescription);
         if (safeLocation != null)
-            device.setLocation(safeLocation);
+            if (safeLocation.equals(""))
+                device.removeLocation();
+            else
+                device.setLocation(safeLocation);
 
         return OK();
     }
