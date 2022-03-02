@@ -17,7 +17,7 @@ import java.util.List;
 
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
-
+@CrossOrigin(origins="http://localhost:8080")
 @RestController
 public class StudentController {
 

@@ -5,6 +5,7 @@ import java.util.List;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.bson.Document;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,7 +15,7 @@ import ac.brunel.techdon.user.Student;
 import ac.brunel.techdon.user.User;
 import ac.brunel.techdon.util.SecurityHelper;
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
-
+@CrossOrigin(origins="http://localhost:8080")
 @RestController
 public class UserController {
 	

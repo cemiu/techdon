@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
-
+@CrossOrigin(origins="http://localhost:8080")
 @RestController
 public class DonorController {
 
