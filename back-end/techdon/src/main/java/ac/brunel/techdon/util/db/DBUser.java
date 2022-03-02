@@ -95,6 +95,7 @@ public class DBUser implements DBInstance {
     public void write() {
         if (!existsInDB) {
             db.insertNew(doc);
+            existsInDB = true;
         } else
             db.update(doc);
     }
@@ -124,17 +125,6 @@ public class DBUser implements DBInstance {
             throw new IllegalArgumentException("Cannot delete a remote device object that is not in the database.");
         db.delete(doc);
         doc = null;
-    }
-
-    /**
-     * Deletes user from the database
-     */
-    // TODO: remove this method
-    public void deleteUserAccount()  {
-    	if (!existsInDB)
-            throw new IllegalArgumentException("Cannot delete a user that is not in the database.");
-    	db.delete(doc);
-    	doc = null;
     }
 
     /**

@@ -4,15 +4,15 @@ import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.bson.types.ObjectId;
 
 import ac.brunel.techdon.util.SecurityHelper;
 import ac.brunel.techdon.util.db.DBUser;
+import ac.brunel.techdon.util.db.support.DBWriteMode;
 
 public class User {
 	private DBUser dbUser;
@@ -29,12 +29,14 @@ public class User {
 	protected List<String> authTokens;
 
 	protected User() {
+		
 	}
 
 	/**
 	 * Constructor for superclass User, used in the Student and Donor subclasses
 	 */
-	public User(String firstName, String lastName, String email, String password, String phone, List<String> address) {
+	protected User(String firstName, String lastName, String email, String password, String phone,
+			List<String> address) {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
@@ -59,9 +61,10 @@ public class User {
 		dbUser.set(LAST_NAME, lastName);
 		dbUser.set(PHONE, phone);
 		dbUser.set(ADDRESS, address);
+
+		dbUser.setWriteMode(DBWriteMode.AUTOMATIC);
 	}
-	
-	
+
 	/**
 	 * Loads all fields that would be used by getting them from the db
 	 */
@@ -79,14 +82,13 @@ public class User {
 
 	// TODO: deleting accounts, consult with db developer
 	public void deleteAccount() {
-		dbUser.deleteUserAccount();
+		dbUser.delete();
 	}
-	
+
 	/**
-	 * Generates a new authentication token when a user
-	 * logs in and checks whether the token is unique.
-	 * Adds the new token to the list of tokens, writes the list
-	 * to the db and returns the new token
+	 * Generates a new authentication token when a user logs in and checks whether
+	 * the token is unique. Adds the new token to the list of tokens, writes the
+	 * list to the db and returns the new token
 	 */
 	public String logIn() {
 		boolean isUnique = false;
@@ -102,8 +104,8 @@ public class User {
 	}
 
 	/**
-	 * When a user logs out removes the token from the
-	 * list and writes the changed list to the db
+	 * When a user logs out removes the token from the list and writes the changed
+	 * list to the db
 	 */
 	public void logOut(String authToken) {
 		authTokens.remove(authToken);
@@ -154,7 +156,7 @@ public class User {
 		this.address = address;
 		dbUser.set(ADDRESS, address);
 	}
-	
+
 	public List<String> getAuthTokens() {
 		return authTokens;
 	}

@@ -135,8 +135,7 @@ public class DatabaseInterfaceTests {
                 "Uxbridge"));
 
         student.set(UNIVERSITY, "Brunel University");
-        student.set(COUNTRY, "United Kingdom");
-
+        
         student.write();
     }
 

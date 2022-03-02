@@ -15,34 +15,31 @@ import ac.brunel.techdon.util.db.DBUser;
 
 public class Student extends User {
 
-	DBStudent dbStudent;
-	//private List<DeviceType> selectedDevices;
+	private DBStudent dbStudent;
+	private String university;
+	// private List<DeviceType> selectedDevices;
 
 	/**
-     * Creates a new student entity, that can
-     * be added to the database
-     */
-	public Student(ObjectId student, String firstName, 
-			String lastName, String email, String password, String phone, 
-			String university, String country, List<String> address) {
+	 * Creates a new student entity, that can be added to the database
+	 */
+	public Student(String firstName, String lastName, String email, String password, String phone, List<String> address,
+			String university) {
 		super(firstName, lastName, email, password, phone, address);
-						
+
 		// TODO: write to db
 		dbStudent = new DBStudent();
-		super.init(dbStudent);
 		dbStudent.set(UNIVERSITY, university);
-		dbStudent.set(COUNTRY, country);
+		super.init(dbStudent);
 	}
-	
+
 	public Student(String auth) {
-		super();
 		dbStudent = new DBStudent(DBUser.Id.AUTH_TOKEN, auth);
 		super.load(dbStudent);
 	}
-	
+
 	// TODO: fix getters and setters & add methods
 	// TODO: load from db (check donor class)
-	
+
 	public DBStudent getDbStudent() {
 		return dbStudent;
 	}
@@ -52,18 +49,12 @@ public class Student extends User {
 	}
 
 	public String getUniversity() {
-		return dbStudent.getString(UNIVERSITY);
+		return this.university;
 	}
 
 	public void setUniversity(String university) {
+		this.university = university;
 		dbStudent.set(UNIVERSITY, university);
 	}
 
-	public String getCountry() {
-		return dbStudent.getString(COUNTRY);
-	}
-
-	public void setCountry(String country) {
-		dbStudent.set(COUNTRY, country);
-	}
 }

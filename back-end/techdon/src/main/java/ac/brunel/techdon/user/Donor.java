@@ -14,14 +14,14 @@ import ac.brunel.techdon.util.db.DBUser;
 
 public class Donor extends User {
 	
-	DBDonor dbDonor;
+	private DBDonor dbDonor;
 	private List<ObjectId> donatedDevices;
 	
 	/**
      * Creates a new donor entity, that can
      * be added to the database
      */
-	public Donor(ObjectId donorId, String firstName, String lastName, String email,
+	public Donor(String firstName, String lastName, String email,
 			String password, String phone, List<String> address) {
 		super(firstName, lastName, email, password, phone, address);
 		
@@ -32,7 +32,6 @@ public class Donor extends User {
 	}
 	
 	public Donor(String auth) {
-		super();
 		dbDonor = new DBDonor(DBUser.Id.AUTH_TOKEN, auth);
 		super.load(dbDonor);
 		

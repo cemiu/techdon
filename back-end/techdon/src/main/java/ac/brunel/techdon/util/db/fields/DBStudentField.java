@@ -6,8 +6,7 @@ package ac.brunel.techdon.util.db.fields;
  */
 public enum DBStudentField implements DBField {
 
-    UNIVERSITY("university"), // string
-    COUNTRY("country"); // string, required (?)
+    UNIVERSITY("university"); // string
 
     private final String key;
 
