@@ -3,7 +3,6 @@ package ac.brunel.techdon.controller;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.commons.validator.routines.EmailValidator;
 import org.bson.Document;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;

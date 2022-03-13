@@ -41,8 +41,7 @@ public class StudentController {
     /**
      * endpoint to set preferences for which devices the students wants
      */
-//    @PostMapping("/api/student/devices/setPreferences")
-    @GetMapping("/api/student/devices/setPreferences")
+    @PostMapping("/api/student/devices/setPreferences")
     public ResponseEntity<String> studentDevicesSetPreferences(
             @RequestParam String authToken,
             @RequestParam(name = "deviceTypes") List<String> updatedDevices
@@ -125,8 +124,7 @@ public class StudentController {
      * endpoint to decline an offered device
      * check documentation for more info on inputs / outputs expected
      */
-//    @PostMapping("/api/student/devices/decline")
-    @GetMapping("/api/student/devices/decline")
+    @PostMapping("/api/student/devices/decline")
     public ResponseEntity<String> studentDevicesDecline(
             @RequestParam String authToken,
             @RequestParam String deviceId

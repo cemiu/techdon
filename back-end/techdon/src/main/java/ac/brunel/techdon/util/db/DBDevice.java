@@ -5,6 +5,7 @@ import ac.brunel.techdon.util.db.fields.DBField;
 import ac.brunel.techdon.util.db.support.DBInstance;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
 import com.mongodb.client.FindIterable;
+import org.bson.BsonType;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -29,14 +30,18 @@ public class DBDevice  implements DBInstance {
         doc.put("_id", new ObjectId());
     }
 
+    private DBDevice(Document doc) {
+        this.doc = doc;
+        if (this.doc == null)
+            existsInDB = false;
+    }
+
     /**
      * Loads a device from the database. Call {@link #doesExistInDB()}
      * after loading to make sure that the device loaded correctly
      */
     public DBDevice(ObjectId deviceId) {
-        this.doc = db.getDocumentByField("_id", deviceId);
-        if (this.doc == null)
-            existsInDB = false;
+        new DBDevice(db.getDocumentByField("_id", deviceId));
     }
 
     /**
@@ -142,6 +147,17 @@ public class DBDevice  implements DBInstance {
         // transforms iterable of device docs into list of device ids
         iterable.map(doc -> doc.getObjectId(DEVICE_ID.getKey()))
                 .forEach(list::add);
+
+        return list;
+    }
+
+    public static List<DBDevice> getUnassignedDevices() {
+        HashMap<String, Object> query = new HashMap<>();
+        query.put(DEVICE_ASSIGNED_STUDENT.getKey(), BsonType.NULL);
+        FindIterable<Document> iterable = db.getDocumentsByFields(query);
+
+        List<DBDevice> list = new ArrayList<>();
+        iterable.map(doc -> new DBDevice(doc)).forEach(list::add);
 
         return list;
     }

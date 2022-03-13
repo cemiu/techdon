@@ -22,8 +22,7 @@ public class DonorController {
      * endpoint to donate a new device
      * check documentation for more info on inputs / outputs expected
      */
-//    @PostMapping("/api/donor/device/new")
-    @GetMapping("/api/donor/device/new")
+    @PostMapping("/api/donor/device/new")
     public ResponseEntity<String> donorDeviceNew(
             @RequestParam String authToken,
             @RequestParam String deviceType,
@@ -59,7 +58,7 @@ public class DonorController {
      * endpoint to show listed Devices
      * check documentation for more info on inputs / outputs expected
      */
-    @GetMapping (value = "/api/donor/device/listedDevices", produces="text/json")
+    @GetMapping (value = "/api/donor/device/listedDevices")
     public ResponseEntity<String> donorListedDevices(
             @RequestParam String authToken
     ) {
@@ -90,8 +89,7 @@ public class DonorController {
      * endpoint to remove a device which has been listed for donation
      * check documentation for more info on inputs / outputs expected
      */
-    //@DeleteMapping (value = "/api/donor/device/remove")
-    @GetMapping (value = "/api/donor/device/remove")
+    @DeleteMapping (value = "/api/donor/device/remove")
     public ResponseEntity<String> donorDeviceRemove(
             @RequestParam String authToken,
             @RequestParam String deviceId
@@ -108,8 +106,7 @@ public class DonorController {
      * endpoint to change values of a device listed for donation
      * check documentation for more info on inputs / outputs expected
      */
-    @GetMapping (value = "/api/donor/device/update")
-//    @PostMapping (value = "/api/donor/device/update")
+    @PostMapping (value = "/api/donor/device/update")
     public ResponseEntity<String> donorDeviceUpdate(
             @RequestParam String authToken,
             @RequestParam String deviceId,

@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 public class Device {
 
@@ -88,12 +89,10 @@ public class Device {
 
     /**
      * Loads a device from the database,
-     * given its object id
+     * without auto-writing
      */
-    private Device(ObjectId deviceId) {
-        // load device from database
-        dbDevice = new DBDevice(deviceId);
-        dbDevice.setWriteMode(DBWriteMode.AUTOMATIC);
+    private Device(DBDevice newDbDevice) {
+        dbDevice = newDbDevice;
 
         // throws error if no device exists
         if (!dbDevice.doesExistInDB())
@@ -118,6 +117,15 @@ public class Device {
             assignedDate = dbDevice.getLong(DEVICE_ASSIGNED_DATE);
             hasBeenClaimed = dbDevice.getBoolean(DEVICE_HAS_BEEN_CLAIMED);
         }
+    }
+
+    /**
+     * Loads a device from the database,
+     * given its object id
+     */
+    private Device(ObjectId deviceId) {
+        this(new DBDevice(deviceId));
+        dbDevice.setWriteMode(DBWriteMode.AUTOMATIC);
     }
 
     /**
@@ -302,6 +310,14 @@ public class Device {
         getDeviceIdsByStudent(studentId, hasBeenClaimed).stream().map(ObjectId::toString)
                 .forEach(list::add);
         return list;
+    }
+
+    /**
+     * Returns a list of all devices
+     * which haven't been assigned to a student
+     */
+    public static List<Device> getUnassignedDevices() {
+        return DBDevice.getUnassignedDevices().stream().map(Device::new).collect(Collectors.toList());
     }
 
     /**

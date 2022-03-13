@@ -8,6 +8,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.bson.BsonType;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
@@ -64,7 +65,7 @@ public class DBInterface {
         Bson[] eqs = new Bson[fields.size()];
         int i = 0;
         for (Map.Entry<String, Object> entry : fields.entrySet()) {
-            eqs[i] = eq(entry.getKey(), entry.getValue());
+            eqs[i] = eq(entry.getKey(), entry.getValue() == BsonType.NULL ? null : entry.getValue());
             i++;
         }
         return collection.find(and(eqs));
