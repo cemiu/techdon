@@ -23,7 +23,7 @@ import static ac.brunel.techdon.util.db.fields.DBStudentField.*;
 public class DatabaseInterfaceTests {
 
     public static void main(String[] args) {
-        loadPreference();
+        createDummyDonor();
     }
 
     private static void addPreference() {

@@ -1,0 +1,59 @@
+.profile-card {
+    margin: 1rem;
+    width: auto;
+    height: 480px auto;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 15px 10px -15px #111;
+}
+.profile-upper {
+    height: 100px auto;
+    background: linear-gradient(to left, #b1bec9, #b1bec9);
+}
+.profile-pic img {
+    background: white;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    padding: 5px;
+    transform: translateY(45px);
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+img {
+    border: 2px solid white(255, 0, 0);
+}
+
+.profile-lower {
+    padding: 1rem;
+    margin-top: 44px;
+    height: 300px auto;
+    background: white;
+    text-align: center;
+}
+.profile-lower h3,
+h4,
+p {
+    margin: 0;
+    padding: 0;
+}
+
+.profile-lower h3 {
+    color: #2f2d2e;
+    font-weight: 600;
+    font-size: 1.5rem;
+}
+.profile-lower h4 {
+    color: #b1bec9;
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+.profile-lower p {
+    margin: 1rem;
+    color: #2f2d2e;
+    font-weight: 300;
+    font-size: 0.9rem;
+    text-align: justify;
+}
