@@ -4,6 +4,7 @@ import static ac.brunel.techdon.util.db.fields.DBDeviceField.*;
 
 import ac.brunel.techdon.util.db.DBDevice;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
+import lombok.Getter;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.security.access.AccessDeniedException;
@@ -18,19 +19,19 @@ public class Device {
 
     DBDevice dbDevice;
 
-    @lombok.Getter private ObjectId deviceId;
+    @Getter private ObjectId deviceId;
 
-    @lombok.Getter private ObjectId donorId;
-    @lombok.Getter private DeviceType type;
-    @lombok.Getter private String name;
+    @Getter private ObjectId donorId;
+    @Getter private DeviceType type;
+    @Getter private String name;
     private long listingDate;
 
     // optional
-    @lombok.Getter private String location; // only needed for in-person collection
-    @lombok.Getter private String description;
-    @lombok.Getter private ObjectId assignedStudent;
+    @Getter private String location; // only needed for in-person collection
+    @Getter private String description;
+    @Getter private ObjectId assignedStudent;
     private Long assignedDate;
-    @lombok.Getter private boolean hasBeenClaimed;
+    @Getter private boolean hasBeenClaimed;
 
     @SuppressWarnings("unused")
     private Device() {}
