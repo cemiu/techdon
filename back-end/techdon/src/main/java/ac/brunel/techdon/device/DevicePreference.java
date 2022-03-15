@@ -4,6 +4,7 @@ import static ac.brunel.techdon.util.db.fields.DBDevicePrefField.*;
 
 import ac.brunel.techdon.util.db.DBDevicePref;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
+import lombok.Getter;
 import org.bson.types.ObjectId;
 
 import java.time.Instant;
@@ -19,8 +20,8 @@ public class DevicePreference {
 
     DBDevicePref dbPref;
 
-    @lombok.Getter private ObjectId studentId;
-    @lombok.Getter private DeviceType deviceType;
+    @Getter private ObjectId studentId;
+    @Getter private DeviceType deviceType;
     private long selectionDate;
     private boolean isPrefInQueue;
 
