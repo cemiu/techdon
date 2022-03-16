@@ -6,7 +6,7 @@ import {DonatePage} from "../../components/DonatePage";
 import ServiceCard from "../../components/servicesProvided/index";
 
 
-const Tittle = styled.h1`
+const Title = styled.h1`
     font-weight: 500;
     color: #2fbb97;
 `;
@@ -18,7 +18,7 @@ export function HomePage(props){
      <TopSection>
      </TopSection>
         <InnerPageContainer>
-            <Tittle> What services we offer</Tittle>
+            <Title> What services we offer</Title>
             <ServiceCard/>
             <DonatePage/>
         </InnerPageContainer>

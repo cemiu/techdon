@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -11,7 +12,7 @@ import Register from "./components/Register";
 
 import Profile from "./components/Profile";
 import Student from "./components/Student";
-import Donater from "./components/Donater";
+import Donor from "./components/Donor";
 import Admin from "./components/Admin";
 
 // import AuthVerify from "./common/AuthVerify";
@@ -21,7 +22,7 @@ import {NavDropdown} from "react-bootstrap";
 
 const App = () => {
   const [showStudent, setStudent] = useState(false);
-  const [showDonator, setDonator] = useState(false);
+  const [showDonor, setDonor] = useState(false);
   const [showAdminBoard, setShowAdminBoard] = useState(false);
   const [currentUser, setCurrentUser] = useState(undefined);
 
@@ -30,9 +31,9 @@ const App = () => {
 
     if (user) {
       setCurrentUser(user);
-      setStudent(user.roles.includes("Student"));
-      setDonator(user.roles.includes("Donator"));
-      setShowAdminBoard(user.roles.includes("Admin"));
+      setStudent(user.type === "student");
+      setDonor(user.type === "donor");
+      setShowAdminBoard(user.type === "admin");
     }
 
     EventBus.on("logout", () => {
@@ -47,7 +48,7 @@ const App = () => {
   const logOut = () => {
     AuthService.logout();
     setStudent(false);
-    setDonator(false);
+    setDonor(false);
     setShowAdminBoard(false);
     setCurrentUser(undefined);
   };
@@ -56,7 +57,7 @@ const App = () => {
     <div>
       <nav className="navbar navbar-expand navbar-dark bg-dark">
         <Link to={"/"} className="navbar-brand">
-          TechDonate
+          TechDon
         </Link>
         <div className="navbar-nav mr-auto">
           <li className="nav-item">
@@ -65,10 +66,10 @@ const App = () => {
             </Link>
           </li>
 
-          {showDonator && (
+          {showDonor && (
             <li className="nav-item">
-              <Link to={"/Donator"} className="nav-link">
-                Donator
+              <Link to={"/Donor"} className="nav-link">
+                Donor
               </Link>
             </li>
           )}
@@ -120,7 +121,7 @@ const App = () => {
           <Route exact path="/register" element={<Register />} />
           <Route exact path="/profile" element={<Profile />} />
           <Route path="/user" element={<Student />} />
-          <Route path="/mod" element={<Donater />} />
+          <Route path="/mod" element={<Donor />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>
 

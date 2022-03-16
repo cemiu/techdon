@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import React from "react";
 import styled from "styled-components";
 //import TopSectionBackground from "../../im"
@@ -76,7 +77,7 @@ export function TopSection(props){
 
         <TopSectionInnerContainer>
          <LogoCenter>
-             <BrandLogo Logosize={200} tittleSize={60} logoMargin={-2} />
+             <BrandLogo Logosize={200} titleSize={60} logoMargin={-2} />
              <Marginer direction={"vertical"} margin={0}/>
              <Slogan>Help Donate education </Slogan>
              <Marginer direction={"vertical"} margin={15}/>

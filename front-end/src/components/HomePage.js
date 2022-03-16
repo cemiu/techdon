@@ -11,7 +11,7 @@ export default function HomePage() {
                 title='About the Company'
                 description='Currently, there are no simple solutions which facilitate the donation of technological items to students,
                 thus making selling or discarding of devices the simplest option, even if the prior owners would have preferred to donate them.
-                For my group we aimed to find a solution to this by developing our platform “TechDonate”.To minimize friction for our users and aimed to simplify the process
+                For my group we aimed to find a solution to this by developing our platform “TechDon”.To minimize friction for our users and aimed to simplify the process
                 by facilitating it on a unified platform with a focus on minimal user involvement. Individuals and organizations can quickly list their devices for donation.
                 Students can select the devices they need (e.g., laptops, hard drives, monitors, etc.) and will then be informed upon availability. To reduce fraud, necessary
                 identification will be performed on donation recipients, while maximizing the efficacy without being overly complex or invasive.'
@@ -42,7 +42,7 @@ const Header = () =>{
     return(
         <div className='header'>
             <span className='header-title'>
-                Tech Donate
+                TechDon
             </span>
             <br/>
             <span className="header-text">

@@ -10,8 +10,8 @@ const getStudent = () => {
   return axios.get(API_URL + "Student");
 };
 
-const getDonat = () => {
-  return axios.get(API_URL + "Donator");
+const getDonor = () => {
+  return axios.get(API_URL + "Donor");
 };
 
 const getAdmin = () => {
@@ -21,7 +21,7 @@ const getAdmin = () => {
 const UserService = {
   getPublicContent,
   getStudent,
-  getDonat,
+  getDonor,
   getAdmin,
 }
 

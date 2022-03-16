@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import styled from "styled-components";
 import {
@@ -53,7 +54,7 @@ const LeftBottomContainer = styled.div`
   display: flex;
 `;
 
-const Tittle = styled.h2`
+const Title = styled.h2`
   margin: 0;
   margin-bottom: 13px;
   color: #000;
@@ -114,19 +115,19 @@ export function Footer (props){
         <FooterContainer>
             <TopContainer>
                 <ContentContainer>
-                    <Tittle>Join Today </Tittle>
+                    <Title>Join Today </Title>
                     <Link>Create Account As A Downer</Link>
                     <Link>Create Account As A Student</Link>
                 </ContentContainer>
                 <ContentContainer>
-                    <Tittle>What we have to offer</Tittle>
+                    <Title>What we have to offer</Title>
                     <Link>Who are we </Link>
                     <Link>Donate</Link>
                 </ContentContainer>
             </TopContainer>
             <BottomContainer>
                 <LeftBottomContainer>
-                <BrandLogo hideLogo Logosize={200} tittleSize={0} color={"#8A8A8A"}/>
+                <BrandLogo hideLogo Logosize={200} titleSize={0} color={"#8A8A8A"}/>
 
                     <PrivacyText> &#169; All Rights Reserved. 2022</PrivacyText>
                 </LeftBottomContainer>

@@ -24,7 +24,7 @@ const Logoimage= styled.div `
   }
 `;
 
-const LogoTittle = styled.h2`
+const LogoTitle = styled.h2`
   margin: 0;
   font-size: ${({size})=> size? size + "px" : "27px"};
   color: ${({color})=> color? color : "#fff"};
@@ -34,13 +34,13 @@ const LogoTittle = styled.h2`
 `;
 export function BrandLogo(prop){
 
-    const {Logosize ,tittleSize , logoMargin , color,hideLogo} = prop;
+    const {Logosize ,titleSize , logoMargin , color,hideLogo} = prop;
 return(
     <BrandLogoContainer>
         {!hideLogo && <Logoimage size ={Logosize} ml ={logoMargin}>
             <img src={LogoImg} alt={"logo"} />
         </Logoimage>}
-        <LogoTittle size={tittleSize} color={color}>Tech Donate</LogoTittle>
+        <LogoTitle size={titleSize} color={color}>TechDon</LogoTitle>
     </BrandLogoContainer>
 
 )

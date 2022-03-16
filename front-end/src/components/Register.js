@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, {useState} from 'react';
 import { Button, Box, TextField, Checkbox } from '@mui/material';
 
@@ -91,7 +92,7 @@ export default function Register() {
 
                                         <option value="">Select User Type</option>
                                         <option value="Student">Student</option>
-                                        <option value="Donator">Donator</option>
+                                        <option value="Donor">Donor</option>
 
                                     </Field>
                                     <ErrorMessage name="title" component="div" className="invalid-feedback"/>

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import styled from "styled-components";
 import {
@@ -73,7 +74,7 @@ export function DonatePage(props) {
         <SpecialistAdContainer>
             <ContentContainer>
                 <SloganContainer>
-                    <BrandLogo Logosize={150} tittleSize={0} logoMargin={0}/>
+                    <BrandLogo Logosize={150} titleSize={0} logoMargin={0}/>
                     <Marginer direction="vertical" margin="0.1em"/>
                    <SloganContainer>
                         <Slogan> HELP REUSE  </Slogan>
