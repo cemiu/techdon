@@ -8,13 +8,12 @@ import AuthService from "./services/auth.service";
 import {HomePage} from "./cointainers/HomePage";
 import Login from "./components/Login";
 import Register from "./components/Register";
-//import Home from "./components/Home";
 
 import Profile from "./components/Profile";
 import Student from "./components/Student";
 import Donor from "./components/Donor";
 import Admin from "./components/Admin";
-
+import Apply from "./components/Apply";
 // import AuthVerify from "./common/AuthVerify";
 import EventBus from "./common/EventBus";
 import {Footer} from "./components/Footer";
@@ -82,6 +81,14 @@ const App = () => {
             </li>
           )}
 
+          {showStudent && (
+              <li className="nav-item">
+                <Link to={"/apply"} className="nav-link">
+                  Apply For Electronics
+                </Link>
+              </li>
+          )}
+
           {currentUser && (
             <li className="nav-item">
               <Link to={"/user"} className="nav-link">
@@ -104,6 +111,7 @@ const App = () => {
               </a>
             </li>
           </div>
+
         ) : (
           <div className="navbar-nav ml-auto">
             <NavDropdown title="Dropdown" id="collasible-nav-dropdown">
@@ -123,11 +131,9 @@ const App = () => {
           <Route path="/user" element={<Student />} />
           <Route path="/mod" element={<Donor />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/apply" element={<Apply/>} />
         </Routes>
-
       <Footer/>
-
-
 
       {/* <AuthVerify logOut={logOut}/> */}
     </div>

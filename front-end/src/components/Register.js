@@ -1,19 +1,27 @@
 /* eslint-disable no-unused-vars */
 import React, {useState} from 'react';
 import { Button, Box, TextField, Checkbox } from '@mui/material';
-
+import '../App.css'
 import { object, string } from 'yup';
 import AuthService from "../services/auth.service";
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import {Marginer} from "./Marginer";
+import {values} from "lodash-es";
+import Banner from "./Banner/Banner";
+import mobileImg from "../images/Pic1.png";
+import defaultImg from "../images/Pic1.png";
 
 export default function Register() {
 
     const [showhide, setShowhide] = useState('');
     const navigate = useNavigate();
     const handleshowhide = (event) => {
+        const getuser = event.target.value;
+        setShowhide(getuser);
+    }
+    const donor = (event) => {
         const getuser = event.target.value;
         setShowhide(getuser);
     }
@@ -30,72 +38,87 @@ export default function Register() {
         acceptTerms: false
     }
 
-        return (
+    return (
+        <div>
+        <Banner
+            mobileSrc={mobileImg}
+            tabletSrc={defaultImg}
+            desktopSrc={defaultImg}
+            alt="my banner"
+            bannerClass="banner_img"
+        />
 
-            <div className="form-container">
-                <Formik initialValues={initialValues}
-                        onSubmit = {(data, formikHelpers) => {
-                            // Log initialValues in console.
-                            console.log(JSON.stringify(data, null, 2));
-                            AuthService.register(data.userType, data.firstName, data.lastName, data.email, data.password, data.phone , data.address, data.university).then(() => {
-                                    alert("Registered! Try logging in!");
-                                    navigate("/Login");
-                                },
-                                error => {
-                                    alert("Registration failed! Try again!");
-                                    const resMessage = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
-                                    console.log(resMessage);
-                                })
-                            // When submitting the form, reset all fields.
-                            formikHelpers.resetForm();
-                        }}
+        <div className="form-container">
 
+            <Formik initialValues={initialValues}
+                    onSubmit = {(data, formikHelpers) => {
+                        // Log initialValues in console.
+                        console.log(JSON.stringify(data, null, 2));
 
+                        AuthService.register(data.userType, data.firstName, data.lastName, data.email, data.password, data.phone , data.address, data.university !== "" ? data.university : undefined).then(() => {
+                                alert("Registered! Try logging in!");
+                                navigate("/Login");
+                            },
+                            error => {
+                                alert("Registration failed! Try again!");
+                                const resMessage = (error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+                                console.log(resMessage);
+                            })
+                        // When submitting the form, reset all fields.
+                        formikHelpers.resetForm();
+                    }}
+                    validationSchema={Yup.object().shape({
+                        address: Yup.string()
+                            .required('Address is required'),
 
+                        firstName: Yup.string()
+                            .required('First Name is required'),
+                        lastName: Yup.string()
+                            .required('Last Name is required'),
+                        email: Yup.string()
+                            .email('Email is invalid')
+                            .required('Email is required'),
+                        password: string().required("Password required!")
+                            .max(19, "Password must not exceed 19 characters")
+                            .matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{9,}$/,
+                                "Password must be at least 9 (one uppercase, one lower case, one digit and one special) characters!)"),
+                        phone: Yup.string()
+                            .min(10, 'Phone number muts be 11 Digits Long Please Include 07')
+                            .required('Phone number required'),
+                        confirmPassword: Yup.string()
+                            .oneOf([Yup.ref('password'), null], 'Passwords must match')
+                            .required('Confirm Password is required'),
+                        acceptTerms: Yup.bool()
+                            .oneOf([true], 'Accept Ts & Cs is required')
+                    })}
 
-                        validationSchema={Yup.object().shape({
-                            address: Yup.string()
-                                .required('Address is required'),
-
-                            firstName: Yup.string()
-                                .required('First Name is required'),
-                            lastName: Yup.string()
-                                .required('Last Name is required'),
-                            email: Yup.string()
-                                .email('Email is invalid')
-                                .required('Email is required'),
-                            university: Yup.string()
-                                .required('University is required'),
-                            password: string().required("Password required!")
-                                .max(19, "Password must not exceed 19 characters")
-                                .matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{9,}$/,
-                                    "Password must be at least 9 (one uppercase, one lower case, one digit and one special) characters!)"),
-                            phone: Yup.string()
-                                .min(10, 'Phone number muts be 11 Digits Long Please Include 07')
-                                .required('Phone number required'),
-                            confirmPassword: Yup.string()
-                                .oneOf([Yup.ref('password'), null], 'Passwords must match')
-                                .required('Confirm Password is required'),
-                            acceptTerms: Yup.bool()
-                                .oneOf([true], 'Accept Ts & Cs is required')
-                        })}
-
-                >
-                    {({errors, status, touched}) => {
-                        console.log(errors)
-                        return (
+            >
+                {({errors, status, touched}) => {
+                    // console.log(errors)
+                    return (
                         <Form>
                             <div className="form-row">
-                                <div className="form-group col">
-                                    <label>User Type</label>
-                                    <Field name="title" as="select" className={'form-control' + (errors.userType && touched.userType ? ' is-invalid' : '')} onChange={(e)=>(handleshowhide(e))}>
+                                <div className="form-group col" onChange={(e)=>(handleshowhide(e))}>
+                                    User Type
+                                    <div role="group" aria-labelledby="my-radio-group">
+                                        <label>
+                                            <Field type="radio" name="userType" value="student" />
+                                            Student
+                                        </label>
+                                        <label>
+                                            <Field type="radio" name="userType" value="donor" />
+                                            Donor
+                                        </label>
+                                    </div>
+                                    {/*<label>User Type</label>*/}
+                                    {/*<Field name ='title' as="select" className={'form-control' } onChange={(e)=>(handleshowhide(e))}>*/}
 
-                                        <option value="">Select User Type</option>
-                                        <option value="Student">Student</option>
-                                        <option value="Donor">Donor</option>
+                                    {/*    <option value=""> Drop down</option>*/}
+                                    {/*    <option value={"Student"}>Student</option>*/}
+                                    {/*    <option value={"Donor"}>Donor</option>*/}
 
-                                    </Field>
-                                    <ErrorMessage name="title" component="div" className="invalid-feedback"/>
+                                    {/*</Field>*/}
+                                    {/*<ErrorMessage name="title" component="div" className="invalid-feedback"/>*/}
                                 </div>
                                 <div className="form-group col-5">
                                     <label htmlFor="firstName">First Name</label>
@@ -118,14 +141,14 @@ export default function Register() {
                             </div>
 
                             {
-                            showhide==='Student' && (
-                            <div className="form-group">
+                                showhide==='student' && (
+                                    <div className="form-group">
 
-                                <label htmlFor="email">University</label>
-                                <Field placeholder="University" name="university" type="text"
-                                       className={'form-control' }/>
-                                <ErrorMessage name="University" component="div" className="invalid-feedback"/>
-                            </div>
+                                        <label htmlFor="university">University</label>
+                                        <Field placeholder="University" name="university" type="text"
+                                               className={'form-control' }/>
+                                        <ErrorMessage name="university" component="div" className="invalid-feedback"/>
+                                    </div>
                                 ) }
 
                             <div className="form-group">
@@ -171,13 +194,11 @@ export default function Register() {
                                 <button type="reset" className="btn btn-secondary">Reset</button>
                             </div>
                         </Form>
-                        )}
-                    }
-                </Formik>
-            </div>
+                    )}
+                }
+            </Formik>
+        </div>
+        </div>
 
-        );
-
-
-
+    );
 }

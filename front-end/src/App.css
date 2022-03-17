@@ -6,8 +6,27 @@
   max-width: 1500px;
   margin: 0 auto;
 }
+.MuiInputBase-root{
+  margin-bottom: 50px;
+  color: yellow;
+}
+.PrivateNotchedOutline-root-5{
+  color: white;
+  border-color: #ffffff;
+}
+.MuiOutlinedInput-notchedOutline{
+  border-color: rgb(255,255,255);
+}
+.MuiFormLabel-root{
+  text-color: #fff;
+}
 a {
   text-decoration:none;
+}
+.form-container {
+  margin: 0 auto;
+  width: 100%;
+  max-width: 50%;
 }
 .App-logo {
   height: 50vmin;
