@@ -2,6 +2,7 @@ package ac.brunel.techdon.util.db;
 
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 
+import ac.brunel.techdon.util.db.DBUser.Id;
 import ac.brunel.techdon.util.db.fields.DBUserField;
 import ac.brunel.techdon.util.db.support.DBInstance;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
@@ -145,6 +146,14 @@ public class DBUser implements DBInstance {
 
         private String getAuthField() {
             return key;
+        }
+    }
+    
+    public static DBUser loadUser(Id idMode, String id) {
+        try {
+            return new DBUser(idMode, id);
+        } catch (Exception e) {
+            return null; // no user with matching criteria
         }
     }
 

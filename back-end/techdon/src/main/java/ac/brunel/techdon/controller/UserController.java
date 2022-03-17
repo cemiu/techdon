@@ -1,7 +1,7 @@
 package ac.brunel.techdon.controller;
 
+import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.bson.Document;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +14,10 @@ import ac.brunel.techdon.user.Donor;
 import ac.brunel.techdon.user.Student;
 import ac.brunel.techdon.user.User;
 import ac.brunel.techdon.util.SecurityHelper;
+import ac.brunel.techdon.util.db.DBDonor;
+import ac.brunel.techdon.util.db.DBUser;
+import ac.brunel.techdon.util.db.DBUser.Id;
+
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
 @CrossOrigin(origins="http://localhost:8080")
 @RestController
@@ -47,8 +51,8 @@ public class UserController {
 		
 		// Checks if any of the parameters are equal to null or are empty and if so 
 		// returns a bad request error message in string format	 
-		if (firstName == "" || lastName == "" || email == "" 
-				|| password == "" || phone == ""  || address.size() > 0) {
+		if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty()
+				|| password.isEmpty() || phone.isEmpty()  || address.size() > 0) {
 			return BAD_REQUEST("One of the required fields is empty.");
 		}
 		
@@ -97,39 +101,94 @@ public class UserController {
 	}
 	
 	/**
-	 * endpoint to register a student account
-	 */
-	public String donorRegister(Donor donor) {
-		
-		String auth = SecurityHelper.generateAuthKey();
-		donor = new Donor(auth);
-		
-		Document response = new Document("authToken", auth)
-				.append("userType", "donor");
-		return response.toJson();
-	}
-	
-	/**
 	 * endpoint for logging users in
 	 */
 	@GetMapping("/api/user/login")
-	public void logIn(User user) {
-		user.logIn();
+	public ResponseEntity<String> logIn(
+			@RequestParam String email, 
+			@RequestParam String password
+			) {
+		
+		// Create a new database user and load their email
+		DBUser dbUser = DBUser.loadUser(DBUser.Id.EMAIL, email);
+		
+		// Check whether it is valid
+		if (dbUser == null) {
+			return UNAUTHORIZED();
+		}
+		
+		// Get the salt and hash
+		String salt = dbUser.getString(PASSWORD_SALT);
+		String newHash = SecurityHelper.getHash(password, salt);
+		
+		// Check if the new hash is the same as the one in db user
+		if (!newHash.equals(dbUser.getString(PASSWORD_HASH))) {
+			return UNAUTHORIZED();
+		}
+		
+		// Generate the new authentication token and get the list of tokens
+		String newAuthToken = SecurityHelper.generateAuthKey();
+		List<String> authTokens = dbUser.getList(AUTH_TOKENS, String.class);
+		
+		// Add the new token to the list
+		authTokens.add(newAuthToken);
+		
+		// Set and write to the database
+		dbUser.set(AUTH_TOKENS, authTokens);
+		dbUser.write();
+		
+		// Returns a response of type Document as Json
+		Document response = new Document("authToken",  newAuthToken)
+					.append("userType", dbUser.getString(USER_ROLE));
+		return OK(response.toJson());
 	}
 	
 	/**
 	 * endpoint for logging users out
 	 */
 	@GetMapping("/api/user/logout")
-	public void logOut(User user) {	
-		user.logOut(user.getAuthTokens().get(0));
+	public ResponseEntity<String> logOut(@RequestParam String authToken) {
+		// Create a new database user and load their authentication tokens
+		DBUser dbUser = DBUser.loadUser(DBUser.Id.AUTH_TOKEN, authToken);
+		
+		// Check whether it is valid
+		if (dbUser == null) {
+			return UNAUTHORIZED();
+		}
+		
+		// Get the list of tokens, assign them to a new variable and remove the specific token
+		List<String> authTokens = dbUser.getList(AUTH_TOKENS, String.class);
+		authTokens.remove(authToken);
+		
+		// Set and write to the database
+		dbUser.set(AUTH_TOKENS, authTokens);
+		dbUser.write();
+		
+		// Returns a new document as Json
+		return OK();
+	}
+	
+	/**
+	 * endpoint for user's to get their settings
+	 */
+	@GetMapping("/api/user/account/settings/get")
+	public ResponseEntity<String> getSettings(@RequestParam String authToken) {
+		return OK();
+	}
+	
+	/**
+	 * endpoint for user's to update settings
+	 */
+	@GetMapping("/api/user/account/settings/update")
+	public ResponseEntity<String> updateSettings(@RequestParam String authToken) {
+		return OK();
 	}
 	
 	/**
 	 * endpoint for deleting user accounts
 	 */
 	@GetMapping("/api/user")
-	public void deleteAccount(User user) {	
-		user.deleteAccount();
+	public ResponseEntity<String> deleteAccount(@RequestParam String authToken) {	
+		return OK();
 	}
 }
