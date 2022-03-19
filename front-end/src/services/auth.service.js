@@ -18,18 +18,20 @@ const register = (userType, firstName, lastName, email, password, phone , addres
 
     console.log(registerRequest);
 
-    return axios.post(API_URL + "api/account/register", registerRequest)
+    return axios.get(API_URL + "api/account/register", { params: registerRequest})
         .then((response) => {
             console.log(response)});
 };
 
 const login = (email, password) => {
+    console.log(email);
+    console.log(password);
     return axios
-        .post(API_URL + "api/account/login", {
-            email,
-            password,
-        })
-        .then((response) => {
+        .get(API_URL + "/api/user/login", { params: {
+                email,
+                password,
+            }})
+       .then((response) => {
             console.log(response);
             if (response.status === 200) {
                 const authToken = response.data.authToken;
@@ -51,7 +53,7 @@ const logout = () => {
 };
 
 const getCurrentUser = () => {
-    return JSON.parse(sessionStorage.getItem("userType"));
+    return sessionStorage.getItem("userType");
 };
 
 const AuthService = {

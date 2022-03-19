@@ -8,7 +8,7 @@ import AuthService from "./services/auth.service";
 import {HomePage} from "./cointainers/HomePage";
 import Login from "./components/Login";
 import Register from "./components/Register";
-
+import MultiCheckBox from "./components/MultiCheckBox";
 import Profile from "./components/Profile";
 import Student from "./components/Student";
 import Donor from "./components/Donor";
@@ -30,9 +30,9 @@ const App = () => {
 
     if (user) {
       setCurrentUser(user);
-      setStudent(user.type === "student");
-      setDonor(user.type === "donor");
-      setShowAdminBoard(user.type === "admin");
+      setStudent(user === "student");
+      setDonor(user === "donor");
+      setShowAdminBoard(user === "admin");
     }
 
     EventBus.on("logout", () => {
@@ -131,7 +131,7 @@ const App = () => {
           <Route path="/user" element={<Student />} />
           <Route path="/mod" element={<Donor />} />
           <Route path="/admin" element={<Admin />} />
-          <Route path="/apply" element={<Apply/>} />
+          <Route path="/apply" element={<MultiCheckBox/>} />
         </Routes>
       <Footer/>
 

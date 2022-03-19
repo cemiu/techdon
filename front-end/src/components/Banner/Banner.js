@@ -13,9 +13,10 @@ import Donor from "../Donor";
 // Here we are making the top sectiong img background - Thoybur
 const TopSectionCointainer = styled.div`
   width: 100%;
-  height: 500px;
+  height: 400px;
   background: url(${TopSectionBackgroundImg}) 0px -40px;
   background-size: cover;
+  margin-bottom: 20px;
 `;
 
 //Here we are making the Background filter - Thoybur
@@ -80,7 +81,7 @@ export function Banner (props){
                     <LogoCenter>
                         <BrandLogo Logosize={200} titleSize={60} logoMargin={-2} />
                         <Marginer direction={"vertical"} margin={0}/>
-                        <Slogan>Help Donate education </Slogan>
+                        <Slogan>Registration </Slogan>
                         <Marginer direction={"vertical"} margin={15}/>
                     </LogoCenter>
                 </TopSectionInnerContainer>
