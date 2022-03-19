@@ -39,7 +39,7 @@ public class User {
 			List<String> address) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.email = email;
+		this.email = email.toLowerCase();
 		this.passwordSalt = UUID.randomUUID().toString();
 		this.passwordHash = SecurityHelper.getHash(password, passwordSalt);
 		this.phone = phone;

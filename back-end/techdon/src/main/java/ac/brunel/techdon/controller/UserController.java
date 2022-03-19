@@ -1,24 +1,19 @@
 package ac.brunel.techdon.controller;
 
-import static ac.brunel.techdon.util.db.fields.DBUserField.*;
-import java.util.List;
-
-import org.bson.Document;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import ac.brunel.techdon.user.Donor;
 import ac.brunel.techdon.user.Student;
 import ac.brunel.techdon.user.User;
 import ac.brunel.techdon.util.SecurityHelper;
-import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBUser;
-import ac.brunel.techdon.util.db.DBUser.Id;
+import org.bson.Document;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
+import static ac.brunel.techdon.util.db.fields.DBUserField.*;
+
 @CrossOrigin(origins="http://localhost:8080")
 @RestController
 public class UserController {
@@ -39,9 +34,11 @@ public class UserController {
 			@RequestParam List<String> address,
 			@RequestParam(required = false) String university
 	) {
-		
+		if (!userType.equals("student") && !userType.equals("donor"))
+			return BAD_REQUEST();
+
 		// If the user is of type student and university is null return an error message
-		if (userType == "student" && university == null) {
+		if (userType.equals("student") && university == null) {
 			return BAD_REQUEST("University is null");
 		}
 		
@@ -52,7 +49,8 @@ public class UserController {
 		// Checks if any of the parameters are equal to null or are empty and if so 
 		// returns a bad request error message in string format	 
 		if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty()
-				|| password.isEmpty() || phone.isEmpty()  || address.size() > 0) {
+				|| password.isEmpty() || phone.isEmpty()
+				|| address.isEmpty() || address.size() > 5) {
 			return BAD_REQUEST("One of the required fields is empty.");
 		}
 		
@@ -107,7 +105,7 @@ public class UserController {
 	public ResponseEntity<String> logIn(
 			@RequestParam String email, 
 			@RequestParam String password
-			) {
+	) {
 		
 		// Create a new database user and load their email
 		DBUser dbUser = DBUser.loadUser(DBUser.Id.EMAIL, email);
@@ -167,13 +165,24 @@ public class UserController {
 		// Returns a new document as Json
 		return OK();
 	}
-	
+
 	/**
 	 * endpoint for user's to get their settings
 	 */
 	@GetMapping("/api/user/account/settings/get")
 	public ResponseEntity<String> getSettings(@RequestParam String authToken) {
-		return OK();
+		DBUser dbUser = DBUser.loadUser(DBUser.Id.AUTH_TOKEN, authToken);
+		if (dbUser == null) {
+			return UNAUTHORIZED();
+		}
+
+		Document response = new Document("userType", dbUser.getString(USER_ROLE))
+				.append("firstName", dbUser.getString(FIRST_NAME))
+				.append("lastName", dbUser.getString(LAST_NAME))
+				.append("email", dbUser.getString(EMAIL))
+				.append("phone", dbUser.getString(PHONE))
+				.append("address", dbUser.getList(ADDRESS, String.class));
+		return OK(response.toJson());
 	}
 	
 	/**

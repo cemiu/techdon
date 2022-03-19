@@ -119,7 +119,7 @@ public class DBUser implements DBInstance {
     }
 
     /**
-     * Deletes the device from the database
+     * Deletes the user from the database
      */
     public void delete() {
         if (!existsInDB)
@@ -151,7 +151,10 @@ public class DBUser implements DBInstance {
     
     public static DBUser loadUser(Id idMode, String id) {
         try {
-            return new DBUser(idMode, id);
+			DBUser user = new DBUser(idMode, id);
+			if (user.doesExistInDB())
+				return user;
+			throw new IllegalArgumentException();
         } catch (Exception e) {
             return null; // no user with matching criteria
         }
