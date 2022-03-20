@@ -11,6 +11,7 @@ import studentOnLaptop from "../../images/grad.jpg"
 import {
     Button
 } from "../Button-Front-page";
+import AuthService from "../../services/auth.service";
 
 
 const SpecialistAdContainer = styled.div`
@@ -81,8 +82,20 @@ export function DonatePage(props) {
                         <Slogan>EDUCATION</Slogan>
                     </SloganContainer>
                     <Marginer direction="vertical" margin="0.1em" />
-                   <Button size={15}>
-                       <Link href="/Register"> JOIN NOW </Link></Button>
+                  {
+                    !AuthService.getUser() && (
+                      <Button >
+                        <Link  href="/Register">Sign up</Link >
+                      </Button>
+                    )
+                  }
+                  {
+                    !AuthService.getUser() && (
+                      <Button >
+                        <Link  href="/Register">Sign up</Link >
+                      </Button>
+                    )
+                  }
                 </SloganContainer>
                 <StandoutImage>
                 </StandoutImage>

@@ -10,7 +10,7 @@ import {HomePage} from "./cointainers/HomePage";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import Settings from "./components/Settings";
-
+import DeviceNew from "./components/UploadDevice";
 import MultiCheckBox from "./components/MultiCheckBox";
 import StudentDevices from "./components/StudentDevices";
 
@@ -67,7 +67,7 @@ const App = () => {
 
         {showDonor && (
           <div className="navbar-nav mr-auto">
-            <Link to={"/devices/new"} className="nav-link">
+            <Link to={"/devices/add"} className="nav-link">
               Donate
             </Link>
             <Link to={"/devices"} className="nav-link">
@@ -115,6 +115,7 @@ const App = () => {
         <Route exact path="/offered" element={<StudentDevices/>}/>
         <Route exact path="/offered/accept" element={<StudentDevicesAccept/>}/>
 
+        <Route exact path="/devices/add" element={<DeviceNew/>}/>
         <Route exact path="/devices" element={<DonorDevices/>}/>
       </Routes>
       <Footer/>
