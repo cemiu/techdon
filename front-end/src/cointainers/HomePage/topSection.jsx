@@ -1,12 +1,12 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from "react";
 import styled from "styled-components";
-//import TopSectionBackground from "../../im"
 import TopSectionBackgroundImg from "../../images/laptopBackGround.jpg"
 import student from "../../images/Teacher_Isometric.png"
 import {BrandLogo} from "../../components/Logo";
 import {Marginer} from "../../components/Marginer";
 import {Button} from "../../components/Button-Front-page";
+import AuthService from "../../services/auth.service";
 
 
 // Here we are making the top sectiong img background - Thoybur
@@ -81,9 +81,13 @@ export function TopSection(props){
              <Marginer direction={"vertical"} margin={0}/>
              <Slogan>Help Donate education </Slogan>
              <Marginer direction={"vertical"} margin={15}/>
-             <Button >
-                 <Link  href="/Register"> Sign up </Link >
-             </Button>
+           {
+             !AuthService.getUser() && (
+               <Button >
+                 <Link  href="/Register">Sign up</Link >
+               </Button>
+             )
+           }
          </LogoCenter>
          <StandoutImg>
             <img src={student}/>

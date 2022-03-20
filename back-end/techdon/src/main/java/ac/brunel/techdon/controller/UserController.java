@@ -145,7 +145,7 @@ public class UserController {
 	/**
 	 * endpoint for logging users out
 	 */
-	@GetMapping("/api/user/logout")
+	@PostMapping("/api/user/logout")
 	public ResponseEntity<String> logOut(@RequestParam String authToken) {
 		// Create a new database user and load their authentication tokens
 		DBUser dbUser = DBUser.loadUser(DBUser.Id.AUTH_TOKEN, authToken);

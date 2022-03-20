@@ -30,6 +30,7 @@ public class DonorController {
             @RequestParam(required = false) String deviceLocation,
             @RequestParam(required = false) String deviceDescription
     ) {
+        System.out.println(authToken + " " + deviceType + " " + deviceName + " " + deviceLocation + " " + deviceDescription);
         DBDonor donor = DBDonor.loadDonor(DBUser.Id.AUTH_TOKEN, authToken);
         DeviceType type = DeviceType.typeFromStringSafe(deviceType);
         if (donor == null || type == null || deviceName.isEmpty())

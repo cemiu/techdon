@@ -97,11 +97,10 @@ public class Device {
 
         // throws error if no device exists
         if (!dbDevice.doesExistInDB())
-            throw new NoSuchElementException("Tried to load device with id " + deviceId +
-                    "but could not find it in the database");
+            throw new NoSuchElementException("Failed to load device");
 
         // populates all values
-        this.deviceId = deviceId;
+        deviceId = dbDevice.getObjectId(DEVICE_ID);
         donorId = dbDevice.getObjectId(DEVICE_DONOR);
         listingDate = dbDevice.getLong(DEVICE_LISTING_DATE);
         type = DeviceType.typeFromString(dbDevice.getString(DEVICE_TYPE));

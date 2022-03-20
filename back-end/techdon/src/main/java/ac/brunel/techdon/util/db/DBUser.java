@@ -151,10 +151,10 @@ public class DBUser implements DBInstance {
     
     public static DBUser loadUser(Id idMode, String id) {
         try {
-			DBUser user = new DBUser(idMode, id);
-			if (user.doesExistInDB())
-				return user;
-			throw new IllegalArgumentException();
+            DBUser user = new DBUser(idMode, id);
+            if (user.doesExistInDB())
+                return user;
+            throw new IllegalArgumentException();
         } catch (Exception e) {
             return null; // no user with matching criteria
         }

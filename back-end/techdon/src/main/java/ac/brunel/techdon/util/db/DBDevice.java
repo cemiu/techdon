@@ -20,7 +20,7 @@ public class DBDevice  implements DBInstance {
     private static final DBInterface db = new DBInterface("devices");
 
     private DBWriteMode writeMode = DBWriteMode.AUTOMATIC;
-    private Document doc;
+    public Document doc;
     private boolean existsInDB = true;
 
     public DBDevice() {
@@ -41,7 +41,7 @@ public class DBDevice  implements DBInstance {
      * after loading to make sure that the device loaded correctly
      */
     public DBDevice(ObjectId deviceId) {
-        new DBDevice(db.getDocumentByField("_id", deviceId));
+        this(db.getDocumentByField("_id", deviceId));
     }
 
     /**
