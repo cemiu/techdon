@@ -56,11 +56,16 @@ const getCurrentUser = () => {
     return sessionStorage.getItem("userType");
 };
 
+const getAuthToken = () => {
+  return sessionStorage.getItem("authToken");
+};
+
 const AuthService = {
     register,
     login,
     logout,
     getCurrentUser,
+    getAuthToken,
 }
 
 export default AuthService;

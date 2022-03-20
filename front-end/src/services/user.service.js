@@ -1,28 +1,50 @@
 import axios from "axios";
+import AuthService from "./auth.service";
 
-const API_URL = "http://localhost:3000/api/";
+const API_URL = "http://localhost:8080/api/";
 
-const getPublicContent = () => {
-  return axios.get(API_URL + "all");
+const getPreferences = () => {
+  const authToken = AuthService.getAuthToken();
+  return axios.get(API_URL + "user/account/settings/get", { params: { authToken } });
 };
 
-const getStudent = () => {
-  return axios.get(API_URL + "Student");
+const isStudent = () => {
+  const user = AuthService.getCurrentUser();
+  if (!user)
+    return undefined;
+  return user === 'student';
 };
 
-const getDonor = () => {
-  return axios.get(API_URL + "Donor");
+const getUserType = () => {
+  switch (AuthService.getCurrentUser()) {
+    case 'student':
+      return 'Student';
+    case 'donor':
+      return 'Donor';
+    default:
+      return undefined;
+  }
 };
 
-const getAdmin = () => {
-  return axios.get(API_URL + "Admin");
+const deleteUser = () => {
+  const authToken = AuthService.getAuthToken();
+  return axios.delete(API_URL + "user/delete", { params: { authToken } })
+    .then(response => {
+      console.log("abc");
+      if (response.status === 200) {
+        sessionStorage.removeItem("authToken");
+        sessionStorage.removeItem("userType");
+        return true;
+      }
+      return false;
+    });
 };
 
 const UserService = {
-  getPublicContent,
-  getStudent,
-  getDonor,
-  getAdmin,
+  getPreferences,
+  isStudent,
+  getUserType,
+  deleteUser,
 }
 
 export default UserService;

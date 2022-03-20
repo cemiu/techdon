@@ -13,7 +13,7 @@ import Donor from "../Donor";
 // Here we are making the top sectiong img background - Thoybur
 const TopSectionCointainer = styled.div`
   width: 100%;
-  height: 400px;
+  height: 230px;
   background: url(${TopSectionBackgroundImg}) 0px -40px;
   background-size: cover;
   margin-bottom: 20px;

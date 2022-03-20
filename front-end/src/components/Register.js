@@ -49,15 +49,15 @@ export default function Register() {
         />
 
         <div className="form-container">
-
+            <h1>Register</h1>
             <Formik initialValues={initialValues}
                     onSubmit = {(data, formikHelpers) => {
                         // Log initialValues in console.
                         console.log(JSON.stringify(data, null, 2));
 
                         AuthService.register(data.userType, data.firstName, data.lastName, data.email, data.password, data.phone , data.address, data.university !== "" ? data.university : undefined).then(() => {
-                                alert("Registered! Try logging in!");
-                                navigate("/Login");
+                                formikHelpers.resetForm();
+                                navigate("/home");
                             },
                             error => {
                                 alert("Registration failed! Try again!");
@@ -65,7 +65,6 @@ export default function Register() {
                                 console.log(resMessage);
                             })
                         // When submitting the form, reset all fields.
-                        formikHelpers.resetForm();
                     }}
                     validationSchema={Yup.object().shape({
                         address: Yup.string()
@@ -79,11 +78,11 @@ export default function Register() {
                             .email('Email is invalid')
                             .required('Email is required'),
                         password: string().required("Password required!")
-                            .max(19, "Password must not exceed 19 characters")
-                            .matches(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{9,}$/,
-                                "Password must be at least 9 (one uppercase, one lower case, one digit and one special) characters!)"),
+                            .max(30, "Password must not exceed 30 characters")
+                            .matches(/^[A-Za-z\d@$!%*#?&]{9,}$/,
+                                "Password must be at least 8 characters long, and contain letters, numbers and @$!%*#?&"),
                         phone: Yup.string()
-                            .min(10, 'Phone number muts be 11 Digits Long Please Include 07')
+                            .min(10, 'Phone number must be at least 10 digits long')
                             .required('Phone number required'),
                         confirmPassword: Yup.string()
                             .oneOf([Yup.ref('password'), null], 'Passwords must match')
@@ -153,13 +152,13 @@ export default function Register() {
 
                             <div className="form-group">
                                 <label htmlFor="phone">Phone Number</label>
-                                <Field placeholder="Phone Number" name="phone" type="number"
+                                <Field placeholder="Phone Number" name="phone" type="text"
                                        className={'form-control' + (errors.phone && touched.phone ? ' is-invalid' : '')}/>
                                 <ErrorMessage name="phone" component="div" className="invalid-feedback"/>
                             </div>
                             <div className="form-group ">
                                 <label htmlFor="confirmPassword">Address</label>
-                                <Field placeholder="Please type in your entire address" name="address" type="address"
+                                <Field placeholder="Please type in your entire address" name="address" type="text"
                                        className={'form-control' + (errors.address && touched.address ? ' is-invalid' : '')}/>
 
                             </div>

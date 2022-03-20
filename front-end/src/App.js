@@ -8,6 +8,7 @@ import AuthService from "./services/auth.service";
 import {HomePage} from "./cointainers/HomePage";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import Settings from "./components/Settings";
 import MultiCheckBox from "./components/MultiCheckBox";
 import Profile from "./components/Profile";
 import Student from "./components/Student";
@@ -128,6 +129,7 @@ const App = () => {
           <Route exact path="/login" element={<Login />} />
           <Route exact path="/register" element={<Register />} />
           <Route exact path="/profile" element={<Profile />} />
+          <Route exact path="/settings" element={<Settings />} />
           <Route path="/user" element={<Student />} />
           <Route path="/mod" element={<Donor />} />
           <Route path="/admin" element={<Admin />} />
