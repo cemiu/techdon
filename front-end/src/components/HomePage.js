@@ -1,7 +1,7 @@
 import React from "react";
 import "../App.css";
 
-export default function HomePage() {
+export default function HomePage(app) {
     return(
         <div id='body'>
             <Header/>

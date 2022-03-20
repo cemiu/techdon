@@ -79,7 +79,7 @@ public class StudentController {
         ObjectId studentId = student.getId();
         List<String> deviceIds = Device.getDevicesByStudent(studentId, false);
 
-        return OK(deviceIds.toString());
+        return OK(new Document("devices", deviceIds).toJson());
     }
 
     /**

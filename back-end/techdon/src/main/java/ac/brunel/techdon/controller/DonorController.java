@@ -5,6 +5,7 @@ import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.device.DeviceType;
 import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBUser;
+import org.bson.Document;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,6 @@ public class DonorController {
             @RequestParam(required = false) String deviceLocation,
             @RequestParam(required = false) String deviceDescription
     ) {
-        System.out.println(authToken + " " + deviceType + " " + deviceName + " " + deviceLocation + " " + deviceDescription);
         DBDonor donor = DBDonor.loadDonor(DBUser.Id.AUTH_TOKEN, authToken);
         DeviceType type = DeviceType.typeFromStringSafe(deviceType);
         if (donor == null || type == null || deviceName.isEmpty())
@@ -68,7 +68,7 @@ public class DonorController {
             return UNAUTHORIZED();
 
         List<String> deviceIds = Device.getDevicesByDonor(donor.getId());
-        return OK(deviceIds.toString());
+        return OK(new Document("devices", deviceIds).toJson());
     }
 
     /**

@@ -10,6 +10,7 @@ export default function Settings() {
 
   const [goToHome, setGoToHome] = useState(false);
   const [delShow, setDelShow] = useState(false);
+  const [updateSuccessShow, setUpdateSuccessShow] = useState(false);
   const [settings, setSettings] = useState({
     userType: UserService.getUserType(),
     firstName: '',
@@ -52,7 +53,14 @@ export default function Settings() {
         <h1 className="mt-4 mb-4">Change Settings</h1>
         <Formik enableReinitialize initialValues={settings}
                 onSubmit={(data, formikHelpers) => {
-                  // TODO post to backend
+                  UserService.setPreferences(data.firstName, data.lastName, data.email, data.phone, data.address, data.password, data.university).then(resp => {
+                    if (resp.status === 200) {
+                      setUpdateSuccessShow(true);
+                      setTimeout(() => {
+                        setUpdateSuccessShow(false);
+                      }, 3000);
+                    }
+                  });
                 }}
                 validationSchema={Yup.object().shape({
                   firstName: Yup.string(),
@@ -141,8 +149,15 @@ export default function Settings() {
                   </div>
                 </div>
 
-                <div className="form-group">
-                  <button type="submit" className="btn btn-primary mr-2">Update</button>
+                <div className="form-row">
+                  <div className="form-group">
+                    <button type="submit" className="btn btn-primary mr-2">Update</button>
+                  </div>
+                  { updateSuccessShow && (
+                        <div className="alert alert-success" role="alert">
+                          <strong>Success!</strong> Your profile has been updated.
+                        </div>
+                  )}
                 </div>
               </Form>
 
@@ -152,7 +167,9 @@ export default function Settings() {
         </Formik>
         {!delShow ? (
           <div className="mt-5">
-            <button type="logout" className="btn btn-warning mr-2">Logout</button>
+            <button type="logout" className="btn btn-warning mr-2" onClick={() => {
+              UserService.logout().then(success => setGoToHome(true) )
+            }}>Logout</button>
             <button type="delete-acc" className="btn btn-danger" onClick={() => setDelShow(true)}>Delete Account</button>
           </div>
         ) : (

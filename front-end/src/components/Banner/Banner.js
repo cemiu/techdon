@@ -1,12 +1,9 @@
 /* eslint-disable jsx-a11y/alt-text */
 import React from "react";
 import styled from "styled-components";
-//import TopSectionBackground from "../../im"
 import TopSectionBackgroundImg from "../../images/logo_transparent.png"
-import student from "../../images/Teacher_Isometric.png"
 import {BrandLogo} from "../../components/Logo";
 import {Marginer} from "../../components/Marginer";
-import {Button} from "../../components/Button-Front-page";
 
 
 // Here we are making the top sectiong img background - Thoybur
@@ -35,25 +32,6 @@ const TopSectionInnerContainer = styled.div`
   justify-content: space-evenly;
 `;
 
-
-// Here we are shaping the img which is in our top secrion - Thoybur
-const StandoutImg = styled.div `
-  width: 20em;
-  height: 18em;
-  margin-left: -155px;
-  //here we are putting the img height
-  img {
-    width: 100%;
-    height: 100%;
-  }
-`;
-const Link = styled.a`
-  text-decoration: none;
-  color: #ffffff;
-  cursor: pointer;
-  text-underline: none;
-
-`;
 const LogoCenter = styled.div `
   display: flex;
   flex-direction: column;

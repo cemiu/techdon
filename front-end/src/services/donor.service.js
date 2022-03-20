@@ -19,7 +19,6 @@ const getListedDevices = () => {
 
 const loadDevice = deviceId => {
   const authToken = AuthService.getAuthToken();
-  console.log(authToken);
   return axios.get(API_URL + "device/load", {
     params: { authToken, deviceId }
   });
