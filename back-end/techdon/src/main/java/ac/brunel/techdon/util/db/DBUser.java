@@ -55,7 +55,7 @@ public class DBUser implements DBInstance {
      * Sets a field in the database, for internal use only
      * Use {@link #set(DBUserField, Object)} for external, safe use
      */
-    protected void set(String field, Object value) {
+    public void set(String field, Object value) {
         doc.put(field, value);
 
         if (writeMode == DBWriteMode.AUTOMATIC)

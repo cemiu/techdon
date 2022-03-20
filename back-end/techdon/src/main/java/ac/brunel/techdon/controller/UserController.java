@@ -5,6 +5,9 @@ import ac.brunel.techdon.user.Student;
 import ac.brunel.techdon.user.User;
 import ac.brunel.techdon.util.SecurityHelper;
 import ac.brunel.techdon.util.db.DBUser;
+import ac.brunel.techdon.util.db.fields.DBUserField;
+
+import org.apache.naming.NamingEntry;
 import org.bson.Document;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -191,8 +194,52 @@ public class UserController {
 	/**
 	 * endpoint for user's to update settings
 	 */
-	@GetMapping("/api/user/account/settings/update")
-	public ResponseEntity<String> updateSettings(@RequestParam String authToken) {
+	@PostMapping("/api/user/account/settings/update")
+	public ResponseEntity<String> updateSettings(
+			@RequestParam(required = false) String firstName,
+			@RequestParam(required = false) String lastName,
+			@RequestParam(required = false) String email,
+			@RequestParam(required = false) String password,
+			@RequestParam(required = false) String phone,
+			@RequestParam(required = false) List<String> address,
+			@RequestParam(required = false) String university,
+			@RequestParam String authToken) {	
+		
+		DBUser dbUser = DBUser.loadUser(DBUser.Id.AUTH_TOKEN, authToken);
+		
+		if (dbUser == null) {
+			return UNAUTHORIZED();
+		}
+		
+		// Checks the validity and sets the new value in the database
+		if (firstName != null && !firstName.isEmpty()) {
+			dbUser.set(FIRST_NAME, firstName);
+		}
+		if (lastName != null && !lastName.isEmpty()) {
+			dbUser.set(LAST_NAME, lastName);
+		}
+		if (email != null && !email.isEmpty()) {
+			dbUser.set(EMAIL, email);
+		}
+		if (password != null && !password.isEmpty()) {
+			// Get the salt and hash
+			String salt = dbUser.getString(PASSWORD_SALT);
+			String newHash = SecurityHelper.getHash(password, salt);
+			
+			dbUser.set(PASSWORD_HASH, newHash);
+		}
+		if (phone != null && !phone.isEmpty()) {
+			dbUser.set(PHONE, phone);
+		}
+		if (address != null && !address.isEmpty()) {
+			dbUser.set(ADDRESS, address);
+		}
+		if (university != null && !university.isEmpty()) {
+			dbUser.set(UNIVERSITY.getKey(), university);
+		}
+		
+		dbUser.write();
+		
 		return OK();
 	}
 
@@ -201,6 +248,14 @@ public class UserController {
 	 */
 	@DeleteMapping("/api/user/delete")
 	public ResponseEntity<String> deleteAccount(@RequestParam String authToken) {
+		DBUser dbUser = DBUser.loadUser(DBUser.Id.AUTH_TOKEN, authToken);
+		
+		if (dbUser == null) {
+			return UNAUTHORIZED();
+		}
+		
+		dbUser.delete();
+		
 		return OK();
 	}
 }
