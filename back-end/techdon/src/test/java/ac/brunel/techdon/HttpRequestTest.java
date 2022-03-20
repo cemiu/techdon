@@ -39,8 +39,5 @@ public class HttpRequestTest {
         fail("FIXME");
 
     }
-    @Test
-    public void makeSureThatGoogleIsUp() {
-        given().when().get("http://www.google.com").then().statusCode(200);
-    }
+
 }

@@ -10,12 +10,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import Settings from "./components/Settings";
 import MultiCheckBox from "./components/MultiCheckBox";
-import Profile from "./components/Profile";
-import Student from "./components/Student";
-import Donor from "./components/Donor";
-import Admin from "./components/Admin";
-import Apply from "./components/Apply";
-// import AuthVerify from "./common/AuthVerify";
+
 import EventBus from "./common/EventBus";
 import {Footer} from "./components/Footer";
 import {NavDropdown} from "react-bootstrap";
@@ -85,30 +80,24 @@ const App = () => {
           {showStudent && (
               <li className="nav-item">
                 <Link to={"/apply"} className="nav-link">
-                  Apply For Electronics
+                  Apply
                 </Link>
               </li>
           )}
-
           {currentUser && (
-            <li className="nav-item">
-              <Link to={"/user"} className="nav-link">
-                User
-              </Link>
-            </li>
+              <li className="nav-item">
+                <Link to={"/settings"} className="nav-link">
+                  Settings
+                </Link>
+              </li>
           )}
         </div>
 
         {currentUser ? (
           <div className="navbar-nav ml-auto">
             <li className="nav-item">
-              <Link to={"/profile"} className="nav-link">
-                {currentUser.username}
-              </Link>
-            </li>
-            <li className="nav-item">
               <a href="/login" className="nav-link" onClick={logOut}>
-                LogOut
+                Log out
               </a>
             </li>
           </div>
@@ -128,16 +117,10 @@ const App = () => {
           <Route exact path={"/home"} element={<HomePage/>} />
           <Route exact path="/login" element={<Login />} />
           <Route exact path="/register" element={<Register />} />
-          <Route exact path="/profile" element={<Profile />} />
           <Route exact path="/settings" element={<Settings />} />
-          <Route path="/user" element={<Student />} />
-          <Route path="/mod" element={<Donor />} />
-          <Route path="/admin" element={<Admin />} />
           <Route path="/apply" element={<MultiCheckBox/>} />
         </Routes>
       <Footer/>
-
-      {/* <AuthVerify logOut={logOut}/> */}
     </div>
   );
 };

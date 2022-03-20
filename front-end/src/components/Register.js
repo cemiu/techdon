@@ -1,14 +1,11 @@
 /* eslint-disable no-unused-vars */
 import React, {useState} from 'react';
-import { Button, Box, TextField, Checkbox } from '@mui/material';
 import '../App.css'
 import { object, string } from 'yup';
 import AuthService from "../services/auth.service";
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
-import {Marginer} from "./Marginer";
-import {values} from "lodash-es";
 import Banner from "./Banner/Banner";
 import mobileImg from "../images/Pic1.png";
 import defaultImg from "../images/Pic1.png";
@@ -79,7 +76,7 @@ export default function Register() {
                             .required('Email is required'),
                         password: string().required("Password required!")
                             .max(30, "Password must not exceed 30 characters")
-                            .matches(/^[A-Za-z\d@$!%*#?&]{9,}$/,
+                            .matches(/^[A-Za-z\d@$!%*#?&]{8,}$/,
                                 "Password must be at least 8 characters long, and contain letters, numbers and @$!%*#?&"),
                         phone: Yup.string()
                             .min(10, 'Phone number must be at least 10 digits long')
@@ -109,16 +106,9 @@ export default function Register() {
                                             Donor
                                         </label>
                                     </div>
-                                    {/*<label>User Type</label>*/}
-                                    {/*<Field name ='title' as="select" className={'form-control' } onChange={(e)=>(handleshowhide(e))}>*/}
-
-                                    {/*    <option value=""> Drop down</option>*/}
-                                    {/*    <option value={"Student"}>Student</option>*/}
-                                    {/*    <option value={"Donor"}>Donor</option>*/}
-
-                                    {/*</Field>*/}
-                                    {/*<ErrorMessage name="title" component="div" className="invalid-feedback"/>*/}
                                 </div>
+                            </div>
+                            <div className="form-row">
                                 <div className="form-group col-5">
                                     <label htmlFor="firstName">First Name</label>
                                     <Field placeholder="First Name " name="firstName" type="text"

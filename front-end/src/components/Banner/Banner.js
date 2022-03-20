@@ -7,7 +7,6 @@ import student from "../../images/Teacher_Isometric.png"
 import {BrandLogo} from "../../components/Logo";
 import {Marginer} from "../../components/Marginer";
 import {Button} from "../../components/Button-Front-page";
-import Donor from "../Donor";
 
 
 // Here we are making the top sectiong img background - Thoybur

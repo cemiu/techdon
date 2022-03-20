@@ -4,7 +4,6 @@ import styled from "styled-components";
 import {
     Marginer
 } from "../Marginer";
-import uniImg from "../../images/uni-removebg-preview.png"
 import {
     BrandLogo
 } from "../Logo";
