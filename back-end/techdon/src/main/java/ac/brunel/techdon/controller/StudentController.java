@@ -35,7 +35,7 @@ public class StudentController {
         ObjectId studentId = student.getId();
         List<String> deviceTypes = DevicePreference.getPreferredDevicesByStudent(studentId);
 
-        return OK(deviceTypes.toString());
+        return OK(new Document("deviceTypes", deviceTypes).toJson());
     }
 
     /**
