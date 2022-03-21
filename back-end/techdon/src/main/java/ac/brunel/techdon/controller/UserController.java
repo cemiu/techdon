@@ -3,6 +3,7 @@ package ac.brunel.techdon.controller;
 import ac.brunel.techdon.user.Donor;
 import ac.brunel.techdon.user.Student;
 import ac.brunel.techdon.user.User;
+import ac.brunel.techdon.util.EmailHelper;
 import ac.brunel.techdon.util.SecurityHelper;
 import ac.brunel.techdon.util.db.DBUser;
 import ac.brunel.techdon.util.db.fields.DBUserField;
@@ -10,6 +11,7 @@ import ac.brunel.techdon.util.db.fields.DBUserField;
 import org.apache.naming.NamingEntry;
 import org.bson.Document;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -45,6 +47,7 @@ public class UserController {
 		if (userType.equals("student") && university == null) {
 			return BAD_REQUEST("University is null");
 		}
+
 
 
 		// TODO: check for duplicates (email), check address
@@ -94,7 +97,10 @@ public class UserController {
 
 		// Generates an auth token
 		String auth = user.logIn();
-
+		try {
+			SimpleMailMessage mail = EmailHelper.getRegisterEmail(email, firstName);
+			EmailHelper.sendEmail(mail);
+		} catch (Exception e) {}
 
 		// Returns a response of type Document as Json
 		Document response = new Document("authToken", auth)

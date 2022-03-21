@@ -70,7 +70,7 @@ const setPreferences = (firstName, lastName, email, phone, address, password, un
   if (address && address !== '') preferences.address = address;
   if (password && password !== '') preferences.password = password;
   if (isStudent() && university && university !== '') preferences.university = university;
-  return axios.post(API_URL + "account/settings/update", null, {params: {authToken, preferences}});
+  return axios.post(API_URL + "account/settings/update", null, {params: preferences});
 };
 
 const isStudent = () => {

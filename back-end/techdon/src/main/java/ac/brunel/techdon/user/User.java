@@ -2,6 +2,7 @@ package ac.brunel.techdon.user;
 
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
 
+import java.io.UnsupportedEncodingException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -13,6 +14,14 @@ import org.bson.types.ObjectId;
 import ac.brunel.techdon.util.SecurityHelper;
 import ac.brunel.techdon.util.db.DBUser;
 import ac.brunel.techdon.util.db.support.DBWriteMode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
+
+
 
 public class User {
 	private DBUser dbUser;
@@ -165,4 +174,5 @@ public class User {
 		this.authTokens = authTokens;
 		dbUser.set(AUTH_TOKENS, authTokens);
 	}
+
 }

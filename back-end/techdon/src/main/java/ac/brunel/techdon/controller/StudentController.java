@@ -4,12 +4,14 @@ import ac.brunel.techdon.controller.util.DeviceHelper;
 import ac.brunel.techdon.device.Device;
 import ac.brunel.techdon.device.DevicePreference;
 import ac.brunel.techdon.device.DeviceType;
+import ac.brunel.techdon.util.EmailHelper;
 import ac.brunel.techdon.util.db.DBDonor;
 import ac.brunel.techdon.util.db.DBStudent;
 import ac.brunel.techdon.util.db.DBUser;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.List;
 
 import static ac.brunel.techdon.controller.util.ResponseHelper.*;
 import static ac.brunel.techdon.util.db.fields.DBUserField.*;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class StudentController {
@@ -110,6 +113,33 @@ public class StudentController {
             return UNAUTHORIZED();
 
         DBDonor donor = new DBDonor(DBUser.Id.USER_ID, device.getDonorId().toString());
+
+        try {
+            if (!device.isHasBeenClaimed()) {
+                DBStudent student = DBStudent.loadStudent(DBUser.Id.USER_ID, device.getAssignedStudent().toString());
+                SimpleMailMessage mailStudent = EmailHelper.getContactDetailsEmail(
+                        student.getString(EMAIL),
+                        student.getString(FIRST_NAME),
+                        donor.getString(FIRST_NAME) + " " + donor.getString(LAST_NAME),
+                        donor.getString(PHONE),
+                        donor.getString(EMAIL),
+                        false
+                );
+
+                SimpleMailMessage mailDonor = EmailHelper.getContactDetailsEmail(
+                        donor.getString(EMAIL),
+                        donor.getString(FIRST_NAME),
+                        student.getString(FIRST_NAME) + " " + student.getString(LAST_NAME),
+                        student.getString(PHONE),
+                        student.getString(EMAIL),
+                        true
+                );
+
+                EmailHelper.sendEmail(mailStudent);
+                EmailHelper.sendEmail(mailDonor);
+            }
+        } catch (Exception e) {}
+
         device.setClaimed();
 
         Document donorData = device.toDoc()
