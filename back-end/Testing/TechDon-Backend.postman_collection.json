@@ -1,0 +1,1898 @@
+{
+	"info": {
+		"_postman_id": "67fe0e27-1c5c-4549-a0f5-8c73af77eb5c",
+		"name": "TechDon-Backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "user-endpoints",
+			"item": [
+				{
+					"name": "registerDonor",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Register donor status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const resp = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Register donor: Correct User Type\", () => {\r",
+									"    pm.expect(resp?.userType).to.equal(\"donor\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Register donor: Returns authentication\", () => {\r",
+									"    pm.expect(resp).to.have.property(\"authToken\");\r",
+									"});\r",
+									"\r",
+									"pm.variables.set('donor', resp?.authToken);\r",
+									"postman.setNextRequest(\"registerStudent\");\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/register?userType=donor&firstName=Joe&lastName=Bloggs&email={{donorEmail}}&password={{donorPassword}}&phone=07793123467&address=20 Brewery Rd, EN11 8HF, Hoddesdon",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"register"
+							],
+							"query": [
+								{
+									"key": "userType",
+									"value": "donor"
+								},
+								{
+									"key": "firstName",
+									"value": "Joe"
+								},
+								{
+									"key": "lastName",
+									"value": "Bloggs"
+								},
+								{
+									"key": "email",
+									"value": "{{donorEmail}}"
+								},
+								{
+									"key": "password",
+									"value": "{{donorPassword}}"
+								},
+								{
+									"key": "phone",
+									"value": "07793123467"
+								},
+								{
+									"key": "address",
+									"value": "20 Brewery Rd, EN11 8HF, Hoddesdon"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "registerStudent",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Register student status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const resp = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Register student: Correct User Type\", () => {\r",
+									"    pm.expect(resp?.userType).to.equal(\"student\");\r",
+									"});\r",
+									"\r",
+									"\r",
+									"pm.test(\"Register student: Returns authentication\", () => {\r",
+									"    pm.expect(resp).to.have.property(\"authToken\");\r",
+									"});\r",
+									"\r",
+									"pm.variables.set('student', resp?.authToken);\r",
+									"postman.setNextRequest(\"wrongLogin\");\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/register?userType=student&firstName=Kate&lastName=Hobbs&email={{studentEmail}}&password={{studentPassword}}&phone=07793609142&address=20 Hillingdon Hill, UB10 0JB, Uxbridge&university=Brunel University",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"register"
+							],
+							"query": [
+								{
+									"key": "userType",
+									"value": "student"
+								},
+								{
+									"key": "firstName",
+									"value": "Kate"
+								},
+								{
+									"key": "lastName",
+									"value": "Hobbs"
+								},
+								{
+									"key": "email",
+									"value": "{{studentEmail}}"
+								},
+								{
+									"key": "password",
+									"value": "{{studentPassword}}"
+								},
+								{
+									"key": "phone",
+									"value": "07793609142"
+								},
+								{
+									"key": "address",
+									"value": "20 Hillingdon Hill, UB10 0JB, Uxbridge"
+								},
+								{
+									"key": "university",
+									"value": "Brunel University"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "wrongLogin",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Wrong login status code is 401\", () => {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"correctLogin\");\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/login?email={{studentEmail}}&password={{donorPassword}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"login"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "{{studentEmail}}"
+								},
+								{
+									"key": "password",
+									"value": "{{donorPassword}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "correctLogin",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Correct login status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"const resp = pm.response.json();\r",
+									"\r",
+									"pm.variables.set('donor2', resp?.authToken);\r",
+									"postman.setNextRequest(\"getSettingsValid\");\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/login?email={{donorEmail}}&password={{donorPassword}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"login"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "{{donorEmail}}"
+								},
+								{
+									"key": "password",
+									"value": "{{donorPassword}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSettingsValid",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Settings get: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Settings get: Correct information is returned\", () => {\r",
+									"    const donorEmail = pm.variables.get(\"donorEmail\");\r",
+									"    pm.expect(pm.response.json().email).to.eql(donorEmail);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"logoutValid\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/account/settings/get?authToken={{donor2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"account",
+								"settings",
+								"get"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor2}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logoutValid",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Logout: Status code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"logoutInvalid\");\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/logout?authToken={{donor2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"logout"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor2}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "logoutInvalid",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Logout invalid: Status code is 401\", () => {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"getSettingsInvalid\");\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/logout?authToken={{donor2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"logout"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor2}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSettingsInvalid",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Settings get invalid: Code is 401\", () => {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"updateSettings\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/account/settings/get?authToken={{donor2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"account",
+								"settings",
+								"get"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor2}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateSettings",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Settings update: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"getSettingsUpdate\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/account/settings/update?authToken={{donor}}&email=othermail@notthesame.com",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"account",
+								"settings",
+								"update"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor}}"
+								},
+								{
+									"key": "email",
+									"value": "othermail@notthesame.com"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getSettingsUpdate",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Settings get: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Settings get: Information is updated\", () => {\r",
+									"    const donorEmail = pm.variables.get(\"donorEmail\");\r",
+									"    pm.expect(pm.response.json().email).not.eql(donorEmail);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"getDeviceListEmpty\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/user/account/settings/get?authToken={{donor}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"user",
+								"account",
+								"settings",
+								"get"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "donor-endpoints",
+			"item": [
+				{
+					"name": "getDeviceListEmpty",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Devices get: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Devices get: response is empty\", () => {\r",
+									"    pm.expect(pm.response.json().devices.length).to.eql(0);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"newDevice\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/donor/device/listedDevices?authToken={{donor}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"donor",
+								"device",
+								"listedDevices"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "newDevice",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Devices new: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.variables.set('device1', pm.response.json()?.deviceId?.$oid);\r",
+									"\r",
+									"postman.setNextRequest(\"newDevice2\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/donor/device/new?authToken={{donor}}&deviceType=laptop&deviceName=Acer Aspire 7&deviceDescription=Slightly used, but in good condition.",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"donor",
+								"device",
+								"new"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor}}"
+								},
+								{
+									"key": "deviceType",
+									"value": "laptop"
+								},
+								{
+									"key": "deviceName",
+									"value": "Acer Aspire 7"
+								},
+								{
+									"key": "deviceDescription",
+									"value": "Slightly used, but in good condition."
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "newDevice2",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Devices new 2: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Devices new 2: To match entered details\", () => {\r",
+									"    const deviceName = pm.variables.get(\"device2Name\");\r",
+									"    pm.expect(pm.response.json().deviceName).to.eql(deviceName);\r",
+									"});\r",
+									"\r",
+									"pm.variables.set('device2', pm.response.json()?.deviceId?.$oid);\r",
+									"\r",
+									"postman.setNextRequest(\"getDeviceListFull\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/donor/device/new?authToken={{donor}}&deviceType=printer&deviceName=Canon PIXMA TS305&deviceDescription=Works without any problems",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"donor",
+								"device",
+								"new"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor}}"
+								},
+								{
+									"key": "deviceType",
+									"value": "printer"
+								},
+								{
+									"key": "deviceName",
+									"value": "Canon PIXMA TS305"
+								},
+								{
+									"key": "deviceDescription",
+									"value": "Works without any problems"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getDeviceListFull",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Devices get: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Devices get: response contains 2 elements\", () => {\r",
+									"    pm.expect(pm.response.json().devices.length).to.eql(2);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"updateDevice\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/donor/device/listedDevices?authToken={{donor}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"donor",
+								"device",
+								"listedDevices"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "updateDevice",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Devices update: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"loadDevice\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/donor/device/update?authToken={{donor}}&deviceId={{device2}}&deviceName=Samsung Xpress M2026W",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"donor",
+								"device",
+								"update"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor}}"
+								},
+								{
+									"key": "deviceId",
+									"value": "{{device2}}"
+								},
+								{
+									"key": "deviceName",
+									"value": "Samsung Xpress M2026W"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "loadDevice",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Device load: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Devices load: To have changed detail\", () => {\r",
+									"    const deviceName = pm.variables.get(\"device2Name\");\r",
+									"    pm.expect(pm.response.json().deviceName).not.eql(deviceName);\r",
+									"});\r",
+									"\r",
+									"pm.variables.set('device2', pm.response.json()?.deviceId?.$oid);\r",
+									"\r",
+									"postman.setNextRequest(\"getDeviceListFull\");\r",
+									"\r",
+									"postman.setNextRequest(\"removeDevice\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/donor/device/load?authToken={{donor}}&deviceId={{device2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"donor",
+								"device",
+								"load"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor}}"
+								},
+								{
+									"key": "deviceId",
+									"value": "{{device2}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "removeDevice",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Device delete: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"getDeviceListReduced\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/donor/device/remove?authToken={{donor}}&deviceId={{device2}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"donor",
+								"device",
+								"remove"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor}}"
+								},
+								{
+									"key": "deviceId",
+									"value": "{{device2}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getDeviceListReduced",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Devices get: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Devices get: response contains 1 elements\", () => {\r",
+									"    pm.expect(pm.response.json().devices.length).to.eql(1);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"loadPrefsEmpty\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/donor/device/listedDevices?authToken={{donor}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"donor",
+								"device",
+								"listedDevices"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{donor}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "student-endpoints",
+			"item": [
+				{
+					"name": "loadPrefsEmpty",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Load preferences: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Load preferences: response contains 0 elements\", () => {\r",
+									"    pm.expect(pm.response.json().deviceTypes.length).to.eql(0);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"setPrefs\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/devices/loadPreferences?authToken={{student}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"devices",
+								"loadPreferences"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{student}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "setPrefs",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Set Prefs: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"loadPrefsFull\");"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/devices/setPreferences?authToken={{student}}&deviceTypes=laptop,iPad",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"devices",
+								"setPreferences"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{student}}"
+								},
+								{
+									"key": "deviceTypes",
+									"value": "laptop,iPad"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "loadPrefsFull",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Load preferences update: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Load preferences update: response contains 2 elements\", () => {\r",
+									"    pm.expect(pm.response.json().deviceTypes.length).to.eql(2);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(\"getOffered\");\r",
+									"setTimeout(function(){}, [1000*10]); // timeout"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/devices/loadPreferences?authToken={{student}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"devices",
+								"loadPreferences"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{student}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getOffered",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Load Offered: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"console.log(pm.response.json().devices);\r",
+									"\r",
+									"pm.test(\"Load Offered: response contains elements\", () => {\r",
+									"    pm.expect(pm.response.json().devices.length).to.be.above(0);\r",
+									"});\r",
+									"\r",
+									"const offered = pm.response.json().devices[0];\r",
+									"pm.variables.set('offered', offered);\r",
+									"\r",
+									"postman.setNextRequest(\"accept\");\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/devices/offeredDevices?authToken={{student}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"devices",
+								"offeredDevices"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{student}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "accept",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"\r",
+									"pm.test(\"Accept Device: Code is 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"postman.setNextRequest(null);\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/student/devices/claim?authToken={{student}}&deviceId={{offered}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"student",
+								"devices",
+								"claim"
+							],
+							"query": [
+								{
+									"key": "authToken",
+									"value": "{{student}}"
+								},
+								{
+									"key": "deviceId",
+									"value": "{{offered}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "donorEmail",
+			"value": "joe@gmail.com",
+			"type": "string"
+		},
+		{
+			"key": "studentEmail",
+			"value": "kate@gmail.com",
+			"type": "string"
+		},
+		{
+			"key": "donorPassword",
+			"value": "March@2020",
+			"type": "string"
+		},
+		{
+			"key": "studentPassword",
+			"value": "January@2021",
+			"type": "string"
+		},
+		{
+			"key": "invalidAuth",
+			"value": "vHQbRpzBWAPiHFOxrKj3rt0Xe2L45SUnfhUIAM0vAUI=",
+			"type": "string"
+		},
+		{
+			"key": "donor",
+			"value": "0Ole0lc4FjNMMw5AI1dMymAV-E4Wb7YJTl_KMLSGrTE=",
+			"type": "string"
+		},
+		{
+			"key": "device2Name",
+			"value": "Canon PIXMA TS305",
+			"type": "string"
+		}
+	]
+}
