@@ -123,6 +123,7 @@ export function Footer (props){
                     <Title>What we have to offer</Title>
                     <Link>Who are we </Link>
                     <Link>Donate</Link>
+                    <a href='/FAQ' className='FAQPAGE'>FAQ</a>
                 </ContentContainer>
             </TopContainer>
             <BottomContainer>

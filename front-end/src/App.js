@@ -4,7 +4,7 @@ import React, {useEffect, useState} from "react";
 import {Link, Navigate, Route, Routes, useLocation} from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-
+import FAQApp from "./components/FAQ/ACCapp";
 import AuthService from "./services/auth.service";
 import {HomePage} from "./cointainers/HomePage";
 import Login from "./components/Login";
@@ -117,6 +117,7 @@ const App = () => {
 
         <Route exact path="/devices/add" element={<DeviceNew/>}/>
         <Route exact path="/devices" element={<DonorDevices/>}/>
+        <Route exact path="/FAQ" element={<FAQApp/>}/>
       </Routes>
       <Footer/>
     </div>
