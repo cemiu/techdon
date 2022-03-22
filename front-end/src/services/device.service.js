@@ -33,9 +33,14 @@ const mapDeviceNameToType = (deviceName) => {
   return Object.keys(deviceNameMap).find(key => deviceNameMap[key] === deviceName);
 };
 
+const getDeviceMap = () => {
+  return deviceNameMap;
+};
+
 const DeviceService = {
   mapDeviceTypeToName,
   mapDeviceNameToType,
+  getDeviceMap,
 };
 
 export default DeviceService;

@@ -30,7 +30,7 @@ public class EmailHelper {
         message.setText("Dear " + firstName + ",\n\n"
                 + "Congratulations!\nYou have been offered a new " + type + ".\n"
                 + "Follow the link below to view the details and accept or decline.\n\n"
-                + "http://localhost:3000/offers/devices/"
+                + "http://localhost:3000/offered/"
                 + "\n\n"
                 + "Regards,\n"
                 + "TechDonate Team");
