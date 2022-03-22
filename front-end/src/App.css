@@ -7,6 +7,10 @@
   margin: 0 auto;
 }
 .register-form{
+  display: grid;
+  flex-direction: row;
+}
+.register-form{
   width: 100%;
   max-width: 500px;
   margin: 0 auto;

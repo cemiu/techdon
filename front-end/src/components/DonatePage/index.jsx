@@ -89,13 +89,7 @@ export function DonatePage(props) {
                       </Button>
                     )
                   }
-                  {
-                    !AuthService.getUser() && (
-                      <Button >
-                        <Link  href="/Register">Sign up</Link >
-                      </Button>
-                    )
-                  }
+               
                 </SloganContainer>
                 <StandoutImage>
                 </StandoutImage>
