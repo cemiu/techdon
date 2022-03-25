@@ -97,6 +97,7 @@ public class UserController {
 
 		// Generates an auth token
 		String auth = user.logIn();
+		
 		try {
 			SimpleMailMessage mail = EmailHelper.getRegisterEmail(email, firstName);
 			EmailHelper.sendEmail(mail);
@@ -264,4 +265,5 @@ public class UserController {
 		
 		return OK();
 	}
+	
 }
